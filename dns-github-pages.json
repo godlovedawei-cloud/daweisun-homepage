@@ -1,0 +1,58 @@
+{
+  "records": [
+    {
+      "name": "@",
+      "type": "A",
+      "content": "185.199.108.153",
+      "ttl": 600
+    },
+    {
+      "name": "@",
+      "type": "A",
+      "content": "185.199.109.153",
+      "ttl": 600
+    },
+    {
+      "name": "@",
+      "type": "A",
+      "content": "185.199.110.153",
+      "ttl": 600
+    },
+    {
+      "name": "@",
+      "type": "A",
+      "content": "185.199.111.153",
+      "ttl": 600
+    },
+    {
+      "name": "@",
+      "type": "AAAA",
+      "content": "2606:50c0:8000::153",
+      "ttl": 600
+    },
+    {
+      "name": "@",
+      "type": "AAAA",
+      "content": "2606:50c0:8001::153",
+      "ttl": 600
+    },
+    {
+      "name": "@",
+      "type": "AAAA",
+      "content": "2606:50c0:8002::153",
+      "ttl": 600
+    },
+    {
+      "name": "@",
+      "type": "AAAA",
+      "content": "2606:50c0:8003::153",
+      "ttl": 600
+    },
+    {
+      "name": "www",
+      "type": "CNAME",
+      "content": "godlovedawei-cloud.github.io",
+      "ttl": 600
+    }
+  ]
+}
