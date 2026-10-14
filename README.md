@@ -61,4 +61,9 @@ Owner-supplied updates include participation in establishing the preoperative an
 
 The Torrance role is Clinical Observer in the Department of Anesthesiology (October 2026, four weeks). The owner confirmed a University of Utah Clinical Observer placement for November 2026 (four weeks, upcoming), with the supplied department name Department of Anesthesiology, Perioperative & Pain Medicine.
 
-Three owner-provided documentary photos appear in the clinical section. ICU and clinic photos are cropped to exclude the patient and clinical information; the original clinical photos are not committed or served. Exported web assets omit EXIF metadata. The teaching caption does not infer students’ nationality. No patient identifiers or clinical records are included in captions or alternative text.
+Three owner-provided documentary photos appear in the clinical section. At the owner’s explicit request, ICU and clinic photographs retain their complete frames; the original full-resolution files are not committed or served. Exported web assets omit EXIF metadata. The teaching caption does not infer students’ nationality. No patient identifiers or clinical records are included in captions or alternative text.
+
+
+## Presentation refinements
+
+The owner requested removal of the standalone location and Upcoming labels, the University of Utah Hospital name, complete clinical photo frames, a neuron illustration in Research, stronger authorship markers, a brief personal description, and an expanded CVC/ScvO2 patent description. The patent description states the intended monitoring use without implying validated clinical outcomes. The owner clarified that the 2019 ASA presentation was one of ten Best of Abstracts: Basic Science selections from more than 1,000 submissions, rather than a single winning abstract. These selection numbers are owner-reported. Asset URLs include content versions so updated CSS and photographs replace cached versions in returning visitors’ browsers.

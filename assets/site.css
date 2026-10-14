@@ -212,3 +212,9 @@ p { margin-bottom: 13px; }
   .clinic-development h3 { font-size: 16px; }
 }
 @media print { .clinical-gallery { break-inside: avoid; } .clinical-photo img { height: 150px; } }
+
+/* Stronger authorship markers and a supporting research illustration. */
+.authorship { color: #bf391b; background: #fff0e8; padding: 1px 6px; border-radius: 3px; font-weight: 750; }
+.hero-role { margin-bottom: 17px; }
+.research-figure { margin: 25px 0 0; max-width: 738px; }
+.research-figure img { display: block; width: 100%; height: auto; }
