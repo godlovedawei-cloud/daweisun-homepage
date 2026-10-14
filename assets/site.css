@@ -53,6 +53,8 @@ p { margin-bottom: 13px; }
 .timeline-content::before { content: ''; width: 5px; height: 5px; position: absolute; left: -3px; top: 9px; border-radius: 50%; background: var(--accent); }
 .institution { font-size: 14px; margin: 0; color: var(--muted); }
 .timeline-detail { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+.observership-counts { display: flex; flex-wrap: wrap; gap: 5px 24px; margin-top: 10px; }
+.observation-count { color: var(--ink); font-variant-numeric: tabular-nums; }
 .training-line { display: block; }
 .training-line + .training-line { margin-top: 7px; }
 .clinical-list { padding: 0 0 0 18px; max-width: 820px; margin: 0; color: var(--muted); }

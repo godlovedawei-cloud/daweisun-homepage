@@ -15,6 +15,8 @@ GRANT_TITLE = 'Protective effects and mechanisms of HIF-2α in immature brain hy
 POSTDOC_NOTE = ('China’s clinical postdoctoral program integrates research with standardized residency training. '
                 'This appointment overlapped my residency and the beginning of my subsequent anesthesiologist role.')
 OBSERVER_FOCUS = 'Regional anesthesia, preoperative assessment, intensive care, and operating-room general anesthesia.'
+# Fill only from the confirmed Torrance observation log; None means not yet entered.
+TORRANCE_OBSERVATION_COUNTS = {'Surgical cases observed': None, 'Nerve blocks observed': None}
 QUALIFICATIONS = [
     'ECFMG Certification · 2026',
     'USMLE Step 1 · Pass',
@@ -28,7 +30,7 @@ QUALIFICATIONS = [
 INSTITUTION = 'Sub-Laboratory of the State Key Laboratory of Membrane Biology, Hangzhou Lin’an District Qingshan Lake Future Industry and Technology Innovation Center'
 HOSPITAL = 'The Second Affiliated Hospital, Zhejiang University School of Medicine'
 TRAINING = [
-    ('2010–2015', 'Bachelor of Medicine in Medicine', 'Wenzhou Medical University', '2010 – July 2015'),
+    ('2010–2015', 'Bachelor of Medicine in Medicine', 'Wenzhou Medical University', 'October 2010 – July 2015'),
     ('2015–2020', 'Ph.D. · Anesthesiology', 'Shanghai Jiao Tong University', 'September 2015 – June 2020'),
     ('2020–2023', 'Residency · Anesthesiology', HOSPITAL, 'September 2020 – August 2023'),
     ('2020–2024', 'Clinical Postdoctoral Fellow', 'Zhejiang University', 'September 2020 – February 2024'),
@@ -39,7 +41,7 @@ PRESENTATIONS = [
 ]
 
 
-BIOGRAPHY = ('I am an anesthesiologist and clinical researcher trained at Shanghai Jiao Tong University and Zhejiang University, '
+BIOGRAPHY = ('I am an anesthesiologist and researcher trained at Shanghai Jiao Tong University and Zhejiang University, '
              'with visiting research experience at UCSF. My residency log includes approximately 600 general anesthetics and '
              '600 monitored anesthesia care encounters; I subsequently practiced as an anesthesiologist for an additional year. '
              'My clinical experience includes regional anesthesia, perioperative care, and helping establish a preoperative anesthesia clinic. '
@@ -52,6 +54,15 @@ REVIEW_HIGHLIGHTS = ['Journal of Clinical Anesthesia', 'International Journal of
 
 def profiles():
     return f'<nav class="academic-profiles" aria-label="Academic profiles"><a href="{ORCID}">ORCID</a><a href="{E(SCHOLAR)}">Google Scholar</a></nav>'
+
+
+def torrance_counts():
+    fields = ''.join(
+        f'<span>{E(label)}: <span class="observation-count">'
+        + (f'{value:,}' if value is not None else '<span aria-label="Not yet entered">—</span>')
+        + '</span></span>'
+        for label, value in TORRANCE_OBSERVATION_COUNTS.items())
+    return '<span class="observership-counts">' + fields + '</span>'
 
 
 def clinical_tables():
@@ -161,7 +172,7 @@ hero = f'''<body>{header()}
 <section class="hero"><div class="wrap hero-layout{' with-portrait' if portrait else ''}">
 <div class="hero-identity">
 <h1>Dawei Sun<span class="credentials">M.D., Ph.D.</span></h1>
-<p class="hero-role">Anesthesiologist &amp; Clinical Researcher</p>
+<p class="hero-role">Anesthesiologist &amp; Researcher</p>
 <a class="hero-email" href="mailto:{EMAIL}">{EMAIL}</a>
 <div class="buttons"><a class="button" href="{CV}">Download CV <span aria-hidden="true">↓</span></a></div>
 {profiles()}
@@ -170,14 +181,14 @@ hero = f'''<body>{header()}
 </div></section>'''
 timeline = '<ol class="career-timeline">'
 timeline += timeline_entry('November 2026', 'Clinical Observer', 'University of Utah Hospital<br>Department of Anesthesiology, Perioperative &amp; Pain Medicine', 'Planned · Four-week observership. Planned areas of observation: ' + E(OBSERVER_FOCUS))
-timeline += timeline_entry('October 2026', 'Clinical Observer', 'Torrance Memorial Hospital<br>Department of Anesthesiology · Torrance, California', 'In progress · Four-week observership. Areas of observation: ' + E(OBSERVER_FOCUS))
+timeline += timeline_entry('October 2026', 'Clinical Observer', 'Torrance Memorial Hospital<br>Department of Anesthesiology · Torrance, California', 'In progress · Four-week observership. Areas of observation: ' + E(OBSERVER_FOCUS) + torrance_counts())
 timeline += timeline_entry('November 2024 – Present', 'Associate Researcher', INSTITUTION, 'Cerebral ischemia and neuroprotection, with a focus on autophagy and mitophagy.')
 timeline += timeline_entry('September 2023 – October 2024', 'Anesthesiologist', HOSPITAL, 'Contributed to establishing the preoperative anesthesia clinic and improving its workflows.')
 timeline += timeline_entry('September 2020 – February 2024', 'Clinical Postdoctoral Fellow', 'Zhejiang University', E(POSTDOC_NOTE))
 timeline += timeline_entry('September 2020 – August 2023', 'Residency in Anesthesiology', HOSPITAL, 'Standardized Residency Training (national program), three years, including an intensive care unit (ICU) rotation.')
 timeline += timeline_entry('October 2018 – October 2019', 'Visiting Scholar', 'University of California San Francisco', 'Neurology &amp; Pediatrics · Research mentor: Donna M. Ferriero')
 timeline += timeline_entry('September 2015 – June 2020', 'Ph.D. in Anesthesiology', 'Shanghai Jiao Tong University')
-timeline += timeline_entry('2010 – July 2015', 'Bachelor of Medicine in Medicine', 'Wenzhou Medical University')
+timeline += timeline_entry('October 2010 – July 2015', 'Bachelor of Medicine in Medicine', 'Wenzhou Medical University')
 timeline += '</ol>'
 clinical = '''<ul class="clinical-list">
 <li>Pre-anesthetic evaluation, perioperative risk assessment, and anesthetic planning.</li>
@@ -226,8 +237,9 @@ asa_presentations = ''.join(
     + (' · Best of Abstracts: Basic Science' if year == '2019' else '')
     + f'</strong><p>{E(title)}</p>'
     + ('<p>One of 10 abstracts selected for the Best of Abstracts: Basic Science oral session from more than 1,000 submissions.</p>' if year == '2019' else '')
+    + f'<p>{E(" · ".join(where.split(" · ")[-2:]))}</p>'
     + '</div>'
-    for year, title, _, _ in PRESENTATIONS)
+    for year, title, _, where in PRESENTATIONS)
 journal_list = '<ul class="journal-list">' + ''.join(f'<li><em>{E(journal)}</em></li>' for journal in REVIEW_HIGHLIGHTS) + '<li>and 12 other journals</li></ul>'
 grants = f'''<dl class="academic-list">
 <div><dt>Research funding</dt><dd><strong>NSFC Young Scientists Fund · Principal Investigator, 2024–2026</strong><p>Project No. 82302479</p><p>{E(GRANT_TITLE)}.</p></dd></div>
@@ -238,7 +250,7 @@ contributions = f'''<dl class="academic-list">
 <div><dt>Volunteer service</dt><dd><strong>Ad Hoc Peer Reviewer · 2024–Present</strong><p>53 peer-review assignments across 17 journals, as of September 2026. Journals include:</p>{journal_list}</dd></div>
 <div><dt>Leadership</dt><dd><strong>President, Graduate Student Union · 2017–2018</strong><p>Shanghai Jiao Tong University Affiliated Sixth Hospital</p><strong>Vice President, Student Union · 2014–2015</strong><p>Wenzhou Medical University</p></dd></div>
 </dl>'''
-home = head('Dawei Sun, M.D., Ph.D. | Anesthesiologist & Clinical Researcher', 'Education, clinical experience, research, publications, and curriculum vitae of Dawei Sun, M.D., Ph.D.') + hero
+home = head('Dawei Sun, M.D., Ph.D. | Anesthesiologist & Researcher', 'Education, clinical experience, research, publications, and curriculum vitae of Dawei Sun, M.D., Ph.D.') + hero
 home += section('training', 'Education &amp; Experience', timeline)
 home += section('clinical', 'Clinical Experience', clinical)
 home += section('research', 'Research', research)
@@ -291,7 +303,7 @@ def build_cv():
   if extra:s+='<br/>'+xml_escape(extra)
   story.append(KeepTogether([text(s)]))
  add('Dawei Sun, M.D., Ph.D.','name')
- add('Anesthesiologist &amp; Clinical Researcher','sub')
+ add('Anesthesiologist &amp; Researcher','sub')
  add(f'<link href="mailto:{EMAIL}">{EMAIL}</link> | <link href="https://daweisun.com">daweisun.com</link>','sub')
  add(f'<link href="{ORCID}">ORCID: 0000-0002-6631-8527</link> | <link href="{xml_escape(SCHOLAR)}">Google Scholar</link>','sub')
  sec('EDUCATION AND TRAINING')
@@ -313,6 +325,8 @@ def build_cv():
  add('Observational focus: '+OBSERVER_FOCUS)
  entry('November 2026 - Four weeks, planned','Clinical Observer','University of Utah Hospital, United States','Department of Anesthesiology, Perioperative & Pain Medicine')
  entry('October 2026 - Four weeks, in progress','Clinical Observer','Torrance Memorial Hospital, Torrance, California, United States','Department of Anesthesiology')
+ confirmed_counts = [f'{label}: {value:,}' for label, value in TORRANCE_OBSERVATION_COUNTS.items() if value is not None]
+ if confirmed_counts: add(xml_escape(' · '.join(confirmed_counts)))
  sec('RESEARCH FUNDING')
  entry('2024 - 2026','Principal Investigator - NSFC Young Scientists Fund','National Natural Science Foundation of China - Project No. 82302479',GRANT_TITLE+'.')
  sec('PATENT')

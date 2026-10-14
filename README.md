@@ -24,13 +24,15 @@ GitHub Pages serves tracked source files as well as pages: never commit private 
 
 ## Content provenance — October 14, 2026
 
-The September 2026 CV is the principal source, supplemented by the December 2025 personal statement and the owner's subsequent corrections. The Wenzhou degree is **Bachelor of Medicine in Medicine**, matching the supplied translated certificate. Only years are used for its start date because the admission month was not independently confirmed. The owner explicitly retains **M.D., Ph.D.** in the public identity.
+The September 2026 CV is the principal source, supplemented by the December 2025 personal statement and the owner's subsequent corrections. The Wenzhou degree is **Bachelor of Medicine in Medicine**, matching the supplied translated certificate. The owner confirmed admission in October 2010, so the education dates are October 2010–July 2015. The owner explicitly retains **M.D., Ph.D.** in the public identity and uses **Anesthesiologist & Researcher** as the introductory role.
 
 The clinical postdoctoral appointment overlapped the national standardized residency and initial postresidency work; it is explained as a Chinese program integrating research and clinical training. The Associate Researcher appointment from November 2024 concerns cerebral ischemia and neuroprotection, with no ongoing clinical practice asserted. Chinese professional titles are labeled by country; no U.S. licensure or ABA equivalence is asserted.
 
 The owner confirmed Step 1, Step 2 CK, and OET passes, ECFMG certification in 2026, and planned Step 3 completion before December 2026. Expired resuscitation certificates are omitted. Torrance Memorial Hospital's Department of Anesthesiology observership is in progress in October 2026; the University of Utah Hospital observership is planned for November 2026. Both last four weeks. The Utah department name is owner-supplied. Observational focus covers regional anesthesia, preoperative assessment, intensive care, and operating-room anesthesia; no hands-on U.S. clinical practice is claimed. Status wording requires review after these dates.
 
 UCSF visiting research was mentored by Donna Ferriero. ORCID 0000-0002-6631-8527 and Google Scholar Jt5Ds1kAAAAJ were confirmed by the owner; the Scholar link is also listed in the public ORCID profile. No unverified reviewer or bibliography profile is linked.
+
+Torrance surgical-case and nerve-block observation counts are intentionally unset in `TORRANCE_OBSERVATION_COUNTS`. The website displays a dash rather than zero; the CV omits unset counts. Fill these fields only with confirmed observation-log numbers. These counts concern procedures observed, separately from prior clinical procedures performed. Homepage ASA entries include the meeting name and city from the presentation records.
 
 ## Clinical counts
 
