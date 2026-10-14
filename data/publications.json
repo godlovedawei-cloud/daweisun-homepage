@@ -21,23 +21,27 @@
     "id": 2,
     "authors": "Wang X, Sun D, Cui D",
     "title": "Critical care progress of traumatic spinal cord injury",
-    "citation": "Chin J TCM WM Crit Care. (2017) 24: 552-555.",
+    "citation": "Chinese Journal of Integrated Traditional and Western Medicine in Intensive and Critical Care. 2017;24:552-555 [in Chinese].",
     "year": 2017,
     "role": "",
     "match_score": 0.907,
-    "verification": "Needs manual verification"
+    "verification": "Citation retained from supplied CV; journal full name verified in publisher journal profile. Article, issue, and external link remain unverified.",
+    "language": "Chinese",
+    "journal": "Chinese Journal of Integrated Traditional and Western Medicine in Intensive and Critical Care",
+    "volume": "24",
+    "pages": "552-555"
   },
   {
     "id": 3,
     "authors": "Xu X, Zhu Q, Zhang R, Wang Y, Niu F, Wang W, Sun D, Wang A",
-    "title": "ITRAQ-Based Proteomics Analysis of Acute Lung Injury Induced by Oleic Acid in Mice",
+    "title": "iTRAQ-Based Proteomics Analysis of Acute Lung Injury Induced by Oleic Acid in Mice",
     "citation": "Cellular Physiology and Biochemistry. 2017;44(5):1949-1964.",
     "year": 2017,
     "role": "",
     "match_score": 1.0,
     "doi": "10.1159/000485885",
     "url": "https://doi.org/10.1159/000485885",
-    "verified_title": "ITRAQ-Based Proteomics Analysis of Acute Lung Injury Induced by Oleic Acid in Mice",
+    "verified_title": "iTRAQ-Based Proteomics Analysis of Acute Lung Injury Induced by Oleic Acid in Mice",
     "journal": "Cellular Physiology and Biochemistry",
     "volume": "44",
     "issue": "5",
@@ -139,7 +143,7 @@
     "id": 9,
     "authors": "Li Y, Hu Y, Sun D, Cui D",
     "title": "Effects of different rewarming rates on neuron autophagy in the cardiac arrest/resuscitation rat model treated with hypothermia",
-    "citation": "Journal of Shanghai Jiao Tong University (Medical Science). 2020;40(11):1454-1460.",
+    "citation": "Journal of Shanghai Jiao Tong University (Medical Science). 2020;40(11):1454-1460 [in Chinese].",
     "year": 2020,
     "role": "",
     "match_score": 0.478,
@@ -150,13 +154,14 @@
     "volume": "40",
     "issue": "11",
     "pages": "1454-1460",
-    "verified_date": "2026-10-14"
+    "verified_date": "2026-10-14",
+    "language": "Chinese"
   },
   {
     "id": 10,
     "authors": "Li Y, Sun D, Cui D",
     "title": "Research progress in the relationship between endosomal sorting complexes required for transport and autophagy",
-    "citation": "Journal of Shanghai Jiao Tong University (Medical Science). 2021;41(9):1256-1260.",
+    "citation": "Journal of Shanghai Jiao Tong University (Medical Science). 2021;41(9):1256-1260 [in Chinese].",
     "year": 2021,
     "role": "",
     "match_score": 0.656,
@@ -167,7 +172,8 @@
     "volume": "41",
     "issue": "9",
     "pages": "1256-1260",
-    "verified_date": "2026-10-14"
+    "verified_date": "2026-10-14",
+    "language": "Chinese"
   },
   {
     "id": 11,
@@ -286,7 +292,7 @@
     "role": "",
     "verification": "Publisher article page",
     "doi": "10.2147/CIA.S487629",
-    "url": "https://www.dovepress.com/postinduction-hypotension-and-adverse-outcomes-in-older-adults-undergo-peer-reviewed-fulltext-article-CIA",
+    "url": "https://doi.org/10.2147/CIA.S487629",
     "journal": "Clinical Interventions in Aging",
     "volume": "19",
     "issue": "",
@@ -350,18 +356,20 @@
   {
     "id": 21,
     "authors": "Chen Y, Yao Y, Sun D, Wang Y, Wu C, Zhao L, Tang Z, Zhang F",
-    "title": "Advances in Monitoring and Reversal Strategies for the Novel Anticoagulants Factor Ⅺ Inhibitors",
-    "citation": "Chinese General Practice. 2025;28:379-384.",
+    "title": "Advances in Monitoring and Reversal Strategies for the Novel Anticoagulants Factor XI Inhibitors",
+    "citation": "Chinese General Practice. 2025;28(3):379-384 [in Chinese].",
     "year": 2025,
     "role": "",
     "match_score": 0.745,
     "verification": "Publisher article page and issue contents",
-    "url": "https://www.chinagp.net/EN/abstract/abstract8114.shtml",
+    "url": "https://doi.org/10.12114/j.issn.1007-9572.2024.0046",
     "journal": "Chinese General Practice",
     "volume": "28",
-    "issue": "",
+    "issue": "3",
     "pages": "379-384",
-    "verified_date": "2026-10-14"
+    "verified_date": "2026-10-14",
+    "language": "Chinese",
+    "doi": "10.12114/j.issn.1007-9572.2024.0046"
   },
   {
     "id": 22,
@@ -403,7 +411,7 @@
     "id": 24,
     "authors": "Wei Y, Sun D, Ng S, He Y, Liu X, Wang J",
     "title": "Cardiovascular Health and Life Expectancy Free of Atherosclerotic Cardiovascular Disease Among Patients with Type 2 Diabetes: a cohort study",
-    "citation": "European Journal of Preventive Cardiology. 2025;:zwaf742.",
+    "citation": "European Journal of Preventive Cardiology. Published online November 24, 2025.",
     "year": 2025,
     "role": "",
     "match_score": 1.0,
@@ -414,7 +422,7 @@
     "volume": "",
     "issue": "",
     "pages": "zwaf742",
-    "verification": "Crossref title match",
+    "verification": "Crossref title and online publication date; volume and issue not assigned in Crossref at 2026-10-14 check.",
     "verified_date": "2026-10-14"
   }
 ]

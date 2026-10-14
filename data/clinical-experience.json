@@ -1,0 +1,105 @@
+{
+  "methodology": "Residency figures are rounded from the training log through approximately July 2023. Cumulative figures through October 2024 are self-reported estimates, calculated as original residency volumes × 4/3 and rounded to the nearest 10. Categories overlap and must not be added to obtain a unique patient total.",
+  "groups": [
+    {
+      "title": "Anesthetic care and surgical specialties",
+      "rows": [
+        {
+          "label": "General anesthesia",
+          "logged": 600,
+          "estimated": 800
+        },
+        {
+          "label": "Monitored anesthesia care (MAC)",
+          "logged": 600,
+          "estimated": 800
+        },
+        {
+          "label": "General, urologic, orthopedic, and burn surgery",
+          "logged": 300,
+          "estimated": 400
+        },
+        {
+          "label": "Pediatric surgery",
+          "logged": 140,
+          "estimated": 190
+        },
+        {
+          "label": "Obstetric and gynecologic surgery",
+          "logged": 90,
+          "estimated": 120
+        },
+        {
+          "label": "Thoracic surgery",
+          "logged": 80,
+          "estimated": 110
+        },
+        {
+          "label": "Cardiovascular surgery",
+          "logged": 30,
+          "estimated": 40
+        },
+        {
+          "label": "Neurosurgery",
+          "logged": 80,
+          "estimated": 100
+        },
+        {
+          "label": "Oral surgery",
+          "logged": 40,
+          "estimated": 50
+        },
+        {
+          "label": "Ophthalmic and ENT surgery",
+          "logged": 90,
+          "estimated": 110
+        },
+        {
+          "label": "Outpatient and/or non-operating-room anesthesia",
+          "logged": 160,
+          "estimated": 210
+        }
+      ]
+    },
+    {
+      "title": "Selected procedures and airway techniques",
+      "rows": [
+        {
+          "label": "Peripheral nerve blocks",
+          "logged": 40,
+          "estimated": 50
+        },
+        {
+          "label": "Neuraxial anesthesia (including epidural)",
+          "logged": 100,
+          "estimated": 140
+        },
+        {
+          "label": "Arterial catheterization",
+          "logged": 100,
+          "estimated": 130
+        },
+        {
+          "label": "Central venous catheterization",
+          "logged": 80,
+          "estimated": 110
+        },
+        {
+          "label": "Double-lumen endobronchial intubation",
+          "logged": 100,
+          "estimated": 130
+        },
+        {
+          "label": "Flexible bronchoscopy",
+          "logged": 50,
+          "estimated": 70
+        },
+        {
+          "label": "Laryngeal mask airway placement",
+          "logged": 30,
+          "estimated": 50
+        }
+      ]
+    }
+  ]
+}

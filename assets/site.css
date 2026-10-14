@@ -28,8 +28,8 @@ p { margin-bottom: 13px; }
 .header-inner { min-height: 75px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .brand { font-size: 15px; font-weight: 600; text-decoration: none; white-space: nowrap; }
 .brand-degree { font-size: 11px; color: var(--muted); font-weight: 400; }
-.nav { display: flex; align-items: center; gap: 23px; }
-.nav a { font-size: 11px; text-decoration: none; color: var(--muted); }
+.nav { display: flex; align-items: center; flex-wrap: wrap; gap: 5px 20px; }
+.nav a { display: inline-flex; align-items: center; min-height: 28px; font-size: 11px; text-decoration: none; color: var(--muted); white-space: nowrap; }
 .nav a:hover, .nav a[aria-current] { color: var(--accent); }
 .hero { padding: 62px 0; }
 .hero-layout { display: grid; align-items: center; }
@@ -57,8 +57,24 @@ p { margin-bottom: 13px; }
 .training-line + .training-line { margin-top: 7px; }
 .clinical-list { padding: 0 0 0 18px; max-width: 820px; margin: 0; color: var(--muted); }
 .clinical-list li { padding-left: 5px; margin-bottom: 9px; }
-.qualification { display: flex; flex-wrap: wrap; gap: 7px 20px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--line); }
-.qualification span { font-size: 12px; color: var(--ink); }
+.qualification { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
+.qualification h3 { font-size: 18px; margin-bottom: 14px; }
+.qualification ul { padding-left: 18px; margin: 0; }
+.qualification li { padding-left: 4px; margin-bottom: 8px; color: var(--muted); font-size: 13px; }
+.academic-profiles { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 18px; font-size: 12px; color: var(--accent); }
+.clinical-volumes { margin-top: 36px; }
+.clinical-volumes > h3 { font-size: 18px; margin-bottom: 10px; }
+.table-intro { color: var(--muted); font-size: 13px; }
+.volume-table { width: 100%; border-collapse: collapse; table-layout: fixed; margin-top: 24px; font-size: 13px; }
+.volume-table caption { text-align: left; font-weight: 600; margin-bottom: 12px; }
+.volume-table th, .volume-table td { border-bottom: 1px solid var(--line); padding: 9px 14px; vertical-align: top; }
+.volume-table thead th { text-align: right; font-size: 12px; line-height: 1.6; background: #edf1ed; font-weight: 600; }
+.volume-table thead th:first-child { width: 54%; text-align: left; }
+.volume-table thead span { color: var(--muted); font-weight: 400; }
+.volume-table tbody th { text-align: left; font-weight: 400; color: var(--muted); }
+.volume-table td { text-align: right; font-variant-numeric: tabular-nums; }
+.volume-table td:last-child { color: var(--accent); font-weight: 600; }
+.volume-method { margin: 18px 0 0; color: var(--muted); font-size: 11px; line-height: 1.8; max-width: 830px; }
 .research-list { display: grid; gap: 24px; max-width: 830px; }
 .research-list h3 { font-size: 17px; margin-bottom: 7px; }
 .research-list p { color: var(--muted); margin: 0; }
@@ -101,17 +117,18 @@ p { margin-bottom: 13px; }
 @media (max-width: 900px) {
   .wrap { width: calc(100% - 64px); }
   .brand-degree { display: none; }
-  .nav { gap: 17px; }
+  .header-inner { flex-wrap: wrap; gap: 2px 24px; padding-block: 10px; }
+  .nav { gap: 3px 17px; }
   .hero-layout.with-portrait { grid-template-columns: minmax(0,1fr) 200px; gap: 35px; }
   h1 { font-size: 57px; }
   .hero-role { font-size: 18px; }
 }
 @media (max-width: 600px) {
-  html { scroll-padding-top: 112px; }
+  html { scroll-padding-top: 150px; }
   .wrap { width: calc(100% - 40px); }
   .header-inner { flex-direction: column; align-items: flex-start; gap: 11px; padding-block: 12px; }
-  .nav { justify-content: space-between; width: 100%; gap: 10px; }
-  .nav a { font-size: 10px; }
+  .nav { justify-content: flex-start; width: 100%; gap: 0 17px; }
+  .nav a { font-size: 11px; }
   .hero { padding: 35px 0 25px; }
   .hero-layout.with-portrait { grid-template-columns: minmax(0,1fr) 112px; gap: 20px; align-items: start; }
   h1 { font-size: 39px; margin-bottom: 18px; }
@@ -133,8 +150,12 @@ p { margin-bottom: 13px; }
   .institution { font-size: 13px; }
   .timeline-detail { font-size: 11px; }
   .clinical-list, .research-list p { font-size: 14px; }
-  .qualification { gap: 7px; flex-direction: column; }
-  .qualification span { font-size: 11px; }
+  .qualification li { font-size: 12px; }
+  .volume-table { font-size: 12px; }
+  .volume-table th, .volume-table td { padding: 9px 7px; }
+  .volume-table thead th { font-size: 10px; overflow-wrap: anywhere; }
+  .volume-table thead th:first-child { width: 46%; }
+  .academic-profiles { font-size: 11px; }
   .research-list h3 { font-size: 16px; }
   .paper { padding-left: 3px; }
   .paper h3 { font-size: 14px; }
@@ -150,7 +171,7 @@ p { margin-bottom: 13px; }
 @media (max-width: 350px) {
   .hero-layout.with-portrait { grid-template-columns: minmax(0,1fr) 90px; gap: 12px; }
   h1 { font-size: 32px; }
-  .nav a { font-size: 9px; }
+  .nav { column-gap: 13px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 @media print {
@@ -213,8 +234,6 @@ p { margin-bottom: 13px; }
 }
 @media print { .clinical-gallery { break-inside: avoid; } .clinical-photo img { height: 150px; } }
 
-/* Stronger authorship markers and a supporting research illustration. */
+/* Distinguish lead and corresponding authorship at a glance. */
 .authorship { color: #bf391b; background: #fff0e8; padding: 1px 6px; border-radius: 3px; font-weight: 750; }
 .hero-role { margin-bottom: 17px; }
-.research-figure { margin: 25px 0 0; max-width: 738px; }
-.research-figure img { display: block; width: 100%; height: auto; }

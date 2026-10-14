@@ -4,14 +4,31 @@ import json, re, html, hashlib
 from xml.sax.saxutils import escape as xml_escape
 ROOT = Path(__file__).resolve().parents[1]
 PUBS = json.loads((ROOT / 'data/publications.json').read_text())
+CLINICAL = json.loads((ROOT / 'data/clinical-experience.json').read_text())
 E = html.escape
 EMAIL = 'dawei.sun.md@gmail.com'
 DATE = 'October 14, 2026'
 CV = '/assets/Dawei-Sun-CV.pdf'
+ORCID = 'https://orcid.org/0000-0002-6631-8527'
+SCHOLAR = 'https://scholar.google.com/citations?user=Jt5Ds1kAAAAJ&hl=en'
+GRANT_TITLE = 'Protective effects and mechanisms of HIF-2α in immature brain hypoxic-ischemic injury through regulation of mitophagy'
+POSTDOC_NOTE = ('China’s clinical postdoctoral program integrates research with standardized residency training. '
+                'This appointment overlapped my residency and the beginning of my subsequent anesthesiologist role.')
+OBSERVER_FOCUS = 'Regional anesthesia, preoperative assessment, intensive care, and operating-room general anesthesia.'
+QUALIFICATIONS = [
+    'ECFMG Certification · 2026',
+    'USMLE Step 1 · Pass',
+    'USMLE Step 2 CK · Pass',
+    'OET Medicine · Pass',
+    'USMLE Step 3 · Planned completion before December 2026',
+    'Attending Physician qualification · Intermediate professional title, Anesthesiology · China, 2024',
+    'Physician Qualification Certificate and Physician Practice Certificate · China, 2016',
+    'Associate Senior Professional Title in Research (Associate Researcher) · Zhejiang Province, China, 2025',
+]
 INSTITUTION = 'Sub-Laboratory of the State Key Laboratory of Membrane Biology, Hangzhou Lin’an District Qingshan Lake Future Industry and Technology Innovation Center'
 HOSPITAL = 'The Second Affiliated Hospital, Zhejiang University School of Medicine'
 TRAINING = [
-    ('2010–2015', 'M.D. · Anesthesiology', 'Wenzhou Medical University', 'October 2010 – July 2015'),
+    ('2010–2015', 'Bachelor of Medicine in Medicine', 'Wenzhou Medical University', '2010 – July 2015'),
     ('2015–2020', 'Ph.D. · Anesthesiology', 'Shanghai Jiao Tong University', 'September 2015 – June 2020'),
     ('2020–2023', 'Residency · Anesthesiology', HOSPITAL, 'September 2020 – August 2023'),
     ('2020–2024', 'Clinical Postdoctoral Fellow', 'Zhejiang University', 'September 2020 – February 2024'),
@@ -22,12 +39,30 @@ PRESENTATIONS = [
 ]
 
 
-BIOGRAPHY = ('I am an anesthesiologist and clinical researcher with doctoral training at Shanghai Jiao Tong University, '
-             'clinical postdoctoral and residency training at Zhejiang University, and visiting research experience at UCSF. '
-             'I am outgoing and approachable, enjoy helping patients and colleagues, and take my clinical responsibilities seriously. '
-             'I bring a solid clinical foundation in perioperative anesthesia and ultrasound-guided procedures, with experience helping establish a preoperative anesthesia clinic. '
-             'I am currently an Associate Researcher whose work focuses on cerebral ischemia and neuroprotection.')
+BIOGRAPHY = ('I am an anesthesiologist and clinical researcher trained at Shanghai Jiao Tong University and Zhejiang University, '
+             'with visiting research experience at UCSF. My residency log includes approximately 600 general anesthetics and '
+             '600 monitored anesthesia care encounters; I subsequently practiced as an anesthesiologist for an additional year. '
+             'My clinical experience includes regional anesthesia, perioperative care, and helping establish a preoperative anesthesia clinic. '
+             'My research spans cerebral ischemia, neuroprotection, and clinical questions about oxygen delivery and patient blood management. '
+             'In 2026, an October observership at Torrance Memorial Hospital and a planned November observership at University of Utah Hospital '
+             'support my clinical re-engagement and familiarity with U.S. anesthesiology practice.')
 REVIEW_JOURNALS = ['International Journal of Surgery', 'Anesthesiology and Perioperative Science', 'Journal of Clinical Anesthesia', 'Drug Design, Development and Therapy', 'International Journal of Molecular Sciences', 'Journal of Clinical Medicine', 'Brazilian Journal of Anesthesiology', 'Abdominal Radiology', 'Anesthesia Research', 'Biomedicines', 'Emergency Care and Medicine', 'Healthcare', 'Journal of Anesthesia and Translational Medicine', 'Journal of Personalized Medicine', 'Journal of Vascular Diseases', 'Methods and Protocols', 'Open Medicine']
+REVIEW_HIGHLIGHTS = ['Journal of Clinical Anesthesia', 'International Journal of Surgery', 'Brazilian Journal of Anesthesiology', 'Anesthesiology and Perioperative Science', 'Journal of Anesthesia and Translational Medicine']
+
+
+def profiles():
+    return f'<nav class="academic-profiles" aria-label="Academic profiles"><a href="{ORCID}">ORCID</a><a href="{E(SCHOLAR)}">Google Scholar</a></nav>'
+
+
+def clinical_tables():
+    output = '<div class="clinical-volumes"><h3>Clinical Experience in Numbers</h3>'
+    output += '<p class="table-intro">Rounded residency records alongside estimated cumulative experience after a further year of clinical practice.</p>'
+    for index, group in enumerate(CLINICAL['groups']):
+        output += f'<table class="volume-table" aria-describedby="volume-method"><caption>{E(group["title"])}</caption><thead><tr><th scope="col">Category</th><th scope="col">Residency log<br><span>~July 2023</span></th><th scope="col">Cumulative estimate<br><span>October 2024</span></th></tr></thead><tbody>'
+        for row in group['rows']:
+            output += f'<tr><th scope="row">{E(row["label"])}</th><td>~{row["logged"]:,}</td><td>~{row["estimated"]:,}</td></tr>'
+        output += '</tbody></table>'
+    return output + f'<p class="volume-method" id="volume-method">{E(CLINICAL["methodology"])}</p></div>'
 
 
 def author_html(authors):
@@ -74,7 +109,12 @@ def head(title, description, path='/'):
 <meta property="og:description" content="{E(description)}">
 <meta property="og:url" content="https://daweisun.com{path}">
 <meta property="og:site_name" content="Dawei Sun">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://daweisun.com/assets/portrait.jpg">
+<meta property="og:image:width" content="783">
+<meta property="og:image:height" content="1000">
+<meta property="og:image:alt" content="Dawei Sun, M.D., Ph.D.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://daweisun.com/assets/portrait.jpg">
 <link rel="stylesheet" href="/assets/site.css">
 </head>'''
 
@@ -82,8 +122,9 @@ def head(title, description, path='/'):
 def header(publications=False):
     home = '/' if publications else ''
     links = ''.join(f'<a href="{home}#{target}">{name}</a>' for target, name in [
-        ('training', 'Education & Experience'), ('clinical', 'Clinical'), ('research', 'Research')])
+        ('training', 'Experience'), ('clinical', 'Clinical'), ('research', 'Research')])
     links += f'<a href="{("/publications.html" if publications else "#publications")}"' + (' aria-current="page"' if publications else '') + '>Publications</a>'
+    links += f'<a href="{home}#grants">Grants &amp; Presentations</a>'
     links += f'<a href="{CV}">CV <span aria-hidden="true">↓</span></a>'
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="site-header"><div class="wrap header-inner">
@@ -116,26 +157,27 @@ def timeline_entry(date, title, institution, detail=''):
 portrait = next((ROOT / 'assets' / name for name in ['portrait.jpg', 'portrait.png', 'portrait.webp'] if (ROOT / 'assets' / name).exists()), None)
 portrait_html = f'<figure class="hero-portrait"><img src="/assets/{portrait.name}" alt="Dawei Sun" width="783" height="1000" fetchpriority="high"></figure>' if portrait else ''
 hero = f'''<body>{header()}
-<main id="main">
+<main id="main" tabindex="-1">
 <section class="hero"><div class="wrap hero-layout{' with-portrait' if portrait else ''}">
 <div class="hero-identity">
 <h1>Dawei Sun<span class="credentials">M.D., Ph.D.</span></h1>
 <p class="hero-role">Anesthesiologist &amp; Clinical Researcher</p>
 <a class="hero-email" href="mailto:{EMAIL}">{EMAIL}</a>
 <div class="buttons"><a class="button" href="{CV}">Download CV <span aria-hidden="true">↓</span></a></div>
+{profiles()}
 </div>{portrait_html}
 <p class="bio">{E(BIOGRAPHY)}</p>
 </div></section>'''
 timeline = '<ol class="career-timeline">'
-timeline += timeline_entry('November 2026', 'Clinical Observer', 'University of Utah Hospital<br>Department of Anesthesiology, Perioperative &amp; Pain Medicine', 'Four-week clinical observership.')
-timeline += timeline_entry('October 2026', 'Clinical Observer', 'Torrance Memorial Hospital<br>Department of Anesthesiology · Torrance, California', 'Four-week clinical observership.')
+timeline += timeline_entry('November 2026', 'Clinical Observer', 'University of Utah Hospital<br>Department of Anesthesiology, Perioperative &amp; Pain Medicine', 'Planned · Four-week observership. Planned areas of observation: ' + E(OBSERVER_FOCUS))
+timeline += timeline_entry('October 2026', 'Clinical Observer', 'Torrance Memorial Hospital<br>Department of Anesthesiology · Torrance, California', 'In progress · Four-week observership. Areas of observation: ' + E(OBSERVER_FOCUS))
 timeline += timeline_entry('November 2024 – Present', 'Associate Researcher', INSTITUTION, 'Cerebral ischemia and neuroprotection, with a focus on autophagy and mitophagy.')
 timeline += timeline_entry('September 2023 – October 2024', 'Anesthesiologist', HOSPITAL, 'Contributed to establishing the preoperative anesthesia clinic and improving its workflows.')
-timeline += timeline_entry('September 2020 – February 2024', 'Clinical Postdoctoral Fellow', 'Zhejiang University', 'Anesthesiology')
-timeline += timeline_entry('September 2020 – August 2023', 'Residency in Anesthesiology', HOSPITAL, 'Training included an intensive care unit (ICU) rotation.')
-timeline += timeline_entry('October 2018 – October 2019', 'Visiting Scholar', 'University of California San Francisco', 'Neurology &amp; Pediatrics')
+timeline += timeline_entry('September 2020 – February 2024', 'Clinical Postdoctoral Fellow', 'Zhejiang University', E(POSTDOC_NOTE))
+timeline += timeline_entry('September 2020 – August 2023', 'Residency in Anesthesiology', HOSPITAL, 'Standardized Residency Training (national program), three years, including an intensive care unit (ICU) rotation.')
+timeline += timeline_entry('October 2018 – October 2019', 'Visiting Scholar', 'University of California San Francisco', 'Neurology &amp; Pediatrics · Research mentor: Donna M. Ferriero')
 timeline += timeline_entry('September 2015 – June 2020', 'Ph.D. in Anesthesiology', 'Shanghai Jiao Tong University')
-timeline += timeline_entry('October 2010 – July 2015', 'M.D. in Anesthesiology', 'Wenzhou Medical University')
+timeline += timeline_entry('2010 – July 2015', 'Bachelor of Medicine in Medicine', 'Wenzhou Medical University')
 timeline += '</ol>'
 clinical = '''<ul class="clinical-list">
 <li>Pre-anesthetic evaluation, perioperative risk assessment, and anesthetic planning.</li>
@@ -166,17 +208,17 @@ clinical = '''<ul class="clinical-list">
 <img src="/assets/clinical/preoperative-clinic.jpg" width="1400" height="1050" loading="lazy" decoding="async" alt="Dawei Sun working in the preoperative anesthesia clinic.">
 <figcaption><strong>Preoperative anesthesia clinic</strong><span>Clinical work at the Second Affiliated Hospital, Zhejiang University School of Medicine.</span></figcaption>
 </figure>
-</div>
-<div class="qualification" aria-label="Professional qualifications">
-<span>ECFMG Certification · 2026</span><span>USMLE Step 3 · Scheduled</span><span>Intermediate Professional Qualification in Anesthesiology · China, 2024</span>
 </div>'''
+clinical += clinical_tables()
+clinical += '<div class="qualification"><h3>Licensure &amp; Qualifications</h3><ul>' + ''.join(f'<li>{E(line)}</li>' for line in QUALIFICATIONS) + '</ul></div>'
 research = '<p class="research-statement">' + (
-    'My research focuses on cerebral ischemia and neuroprotection, particularly the roles of autophagy, mitophagy, and HIF-2α in neuronal survival after hypoxic-ischemic injury. '
-    'My doctoral work and visiting research at UCSF provided a foundation in experimental neuroscience. '
-    'During clinical postdoctoral training, I also conducted prospective and retrospective studies of patient blood management and perioperative outcomes. '
-    'This work includes exploring physiologic indicators of oxygen delivery and utilization to inform transfusion decisions in cardiac surgery, as well as studies of blood conservation and coagulation. '
-    'I have also contributed as a corresponding author to randomized controlled trials of ciprofol, a novel intravenous anesthetic, and anesthetic strategies for postoperative cognitive recovery.'
-) + '</p><figure class="research-figure"><img src="/assets/neuronal-research.png" width="738" height="414" loading="lazy" decoding="async" alt="Illustration of a neuron and its branching processes."></figure>'
+    'My clinical research examines how physiologic indicators of oxygen delivery and utilization can inform perioperative care and patient blood management. '
+    'During clinical postdoctoral training, I investigated arterial-venous oxygen differences as potential transfusion indicators and contributed to studies of acute normovolemic hemodilution, postoperative coagulation, and hemoglobin levels. '
+    'This interest also led to a central venous oxygen saturation monitoring device design. '
+    'I have served as a corresponding author on randomized trials of ciprofol, a novel intravenous anesthetic, and anesthetic strategies for postoperative cognitive recovery. '
+    'My experimental work focuses on cerebral ischemia and neuroprotection, particularly HIF-2α, autophagy, and mitophagy after hypoxic-ischemic injury. '
+    'This work builds on doctoral training and research with Donna Ferriero at UCSF and is the focus of my current Associate Researcher appointment.'
+) + '</p>' + profiles()
 all_papers = sorted(PUBS, key=lambda p: (p['year'], p['id']), reverse=True)
 publications = '<p class="section-note">First, co-first, and corresponding authorship are indicated after each citation.</p><ol class="publications-list">' + ''.join(paper(p) for p in all_papers) + '</ol>'
 asa_presentations = ''.join(
@@ -186,11 +228,13 @@ asa_presentations = ''.join(
     + ('<p>One of 10 abstracts selected for the Best of Abstracts: Basic Science oral session from more than 1,000 submissions.</p>' if year == '2019' else '')
     + '</div>'
     for year, title, _, _ in PRESENTATIONS)
-journal_list = '<ul class="journal-list">' + ''.join(f'<li><em>{E(journal)}</em></li>' for journal in REVIEW_JOURNALS) + '</ul>'
-contributions = f'''<dl class="academic-list">
-<div><dt>Research funding</dt><dd><strong>NSFC Young Scientists Fund · Principal Investigator, 2024–2026</strong><p>HIF-2α-mediated neuroprotection and the regulation of mitophagy in immature hypoxic-ischemic brain injury.</p></dd></div>
+journal_list = '<ul class="journal-list">' + ''.join(f'<li><em>{E(journal)}</em></li>' for journal in REVIEW_HIGHLIGHTS) + '<li>and 12 other journals</li></ul>'
+grants = f'''<dl class="academic-list">
+<div><dt>Research funding</dt><dd><strong>NSFC Young Scientists Fund · Principal Investigator, 2024–2026</strong><p>Project No. 82302479</p><p>{E(GRANT_TITLE)}.</p></dd></div>
 <div><dt>ASA presentations</dt><dd>{asa_presentations}</dd></div>
-<div><dt>Patent</dt><dd><strong>Continuous oxygen saturation monitoring probe</strong><p>Developed from my interest in oxygen monitoring, this patent describes a probe designed for placement within a central venous catheter to continuously monitor central venous oxygen saturation (ScvO₂). The intended application is to help assess the balance between oxygen delivery and consumption in real time.</p><p>Co-inventor · Chinese Utility Model Patent ZL 2024 2 3305545.1. Granted April 21, 2026.</p></dd></div>
+</dl>'''
+patent = '''<h3>Continuous oxygen saturation monitoring probe</h3><p>A probe designed for placement within a central venous catheter to continuously monitor central venous oxygen saturation (ScvO₂), with the intended application of assessing the balance between oxygen delivery and consumption in real time.</p><p>First inventor · Chinese Utility Model Patent ZL 2024 2 3305545.1. Granted April 21, 2026. A utility model protects a technical product design.</p>'''
+contributions = f'''<dl class="academic-list">
 <div><dt>Volunteer service</dt><dd><strong>Ad Hoc Peer Reviewer · 2024–Present</strong><p>53 peer-review assignments across 17 journals, as of September 2026. Journals include:</p>{journal_list}</dd></div>
 <div><dt>Leadership</dt><dd><strong>President, Graduate Student Union · 2017–2018</strong><p>Shanghai Jiao Tong University Affiliated Sixth Hospital</p><strong>Vice President, Student Union · 2014–2015</strong><p>Wenzhou Medical University</p></dd></div>
 </dl>'''
@@ -198,6 +242,8 @@ home = head('Dawei Sun, M.D., Ph.D. | Anesthesiologist & Clinical Researcher', '
 home += section('training', 'Education &amp; Experience', timeline)
 home += section('clinical', 'Clinical Experience', clinical)
 home += section('research', 'Research', research)
+home += section('grants', 'Grants &amp; Presentations', grants)
+home += section('innovation', 'Innovation', patent)
 home += section('publications', 'Publications', publications)
 home += section('contributions', 'Academic Service &amp; Leadership', contributions)
 home += '</main>' + footer()
@@ -210,12 +256,12 @@ for year in years:
     groups += f'<section class="year-section" id="year-{year}" aria-labelledby="heading-{year}"><h2 class="year-heading" id="heading-{year}">{year}</h2><ol class="publications-list">' + ''.join(paper(p) for p in all_papers if p['year'] == year) + '</ol></section>'
 groups += '<section class="year-section" id="presentations" aria-labelledby="presentations-title"><h2 class="year-heading" id="presentations-title">Scientific Presentations</h2>' + ''.join(f'<article class="presentation"><p class="date">{year}</p><h3>{E(title)}</h3><p>{author_html(authors)}</p><p>{E(where)}</p></article>' for year, title, authors, where in PRESENTATIONS) + '</section>'
 groups += '<p class="publication-note">Listed by publication year in the September 2026 CV, including online-first dates. Conference presentations are listed separately.</p>'
-page = head('Publications | Dawei Sun, M.D., Ph.D.', 'Peer-reviewed publications and scientific presentations by Dawei Sun.', '/publications.html') + '<body class="publication-page">' + header(True) + '<main id="main"><div class="wrap page-intro"><a class="back-link" href="/">← Back to home</a><h1>Publications</h1><p class="section-note">First, co-first, and corresponding authorship are indicated after each citation.</p>' + yearnav + '</div><div class="wrap publication-layout">' + groups + '</div></main>' + footer()
+page = head('Publications | Dawei Sun, M.D., Ph.D.', 'Peer-reviewed publications and scientific presentations by Dawei Sun.', '/publications.html') + '<body class="publication-page">' + header(True) + '<main id="main" tabindex="-1"><div class="wrap page-intro"><a class="back-link" href="/">← Back to home</a><h1>Publications</h1><p class="section-note">First, co-first, and corresponding authorship are indicated after each citation.</p>' + yearnav + '</div><div class="wrap publication-layout">' + groups + '</div></main>' + footer()
 (ROOT / 'publications.html').write_text(version_assets(page))
 
 
 def build_cv():
- from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,KeepTogether,PageBreak
+ from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,KeepTogether,PageBreak,Table,TableStyle
  from reportlab.lib.styles import ParagraphStyle
  from reportlab.lib import colors
  from reportlab.lib.enums import TA_LEFT
@@ -233,7 +279,9 @@ def build_cv():
  'section':ParagraphStyle('section',fontName='CV-Bold',fontSize=11,leading=15,textColor=colors.HexColor('#326b5c'),spaceBefore=16,spaceAfter=9,keepWithNext=True),
  'body':ParagraphStyle('body',fontName='CV',fontSize=9.5,leading=14,spaceAfter=7),
  'pub':ParagraphStyle('pub',fontName='CV',fontSize=8.8,leading=12.8,spaceAfter=8),
- 'note':ParagraphStyle('note',fontName='CV',fontSize=8,leading=11,textColor=colors.HexColor('#53636c'),spaceAfter=8)}
+ 'note':ParagraphStyle('note',fontName='CV',fontSize=8,leading=11,textColor=colors.HexColor('#53636c'),spaceAfter=8),
+ 'cell':ParagraphStyle('cell',fontName='CV',fontSize=8.4,leading=11.5),
+ 'cellhead':ParagraphStyle('cellhead',fontName='CV-Bold',fontSize=8.4,leading=11.5,textColor=colors.HexColor('#172c3d'))}
  story=[]
  def text(s,style='body'):return Paragraph(re.sub('[\u2010-\u2015]', '-', s.replace('Ⅺ','XI')),styles[style])
  def add(s,style='body'):story.append(text(s,style))
@@ -245,28 +293,44 @@ def build_cv():
  add('Dawei Sun, M.D., Ph.D.','name')
  add('Anesthesiologist &amp; Clinical Researcher','sub')
  add(f'<link href="mailto:{EMAIL}">{EMAIL}</link> | <link href="https://daweisun.com">daweisun.com</link>','sub')
+ add(f'<link href="{ORCID}">ORCID: 0000-0002-6631-8527</link> | <link href="{xml_escape(SCHOLAR)}">Google Scholar</link>','sub')
  sec('EDUCATION AND TRAINING')
  for _,role,inst,date in TRAINING:
-  entry(date,role.replace('·','-'),inst,'Training included an intensive care unit (ICU) rotation.' if role.startswith('Residency') else '')
+  detail = ''
+  if role.startswith('Residency'): detail='Standardized Residency Training (national program), three years, including an intensive care unit (ICU) rotation.'
+  if role.startswith('Clinical Postdoctoral'): detail=POSTDOC_NOTE
+  entry(date,role.replace('·','-'),inst,detail)
   if role.startswith('Ph.D.'):
-   entry('October 2018 - October 2019','Visiting Scholar - Neurology and Pediatrics','University of California San Francisco, United States')
+   entry('October 2018 - October 2019','Visiting Scholar - Neurology and Pediatrics','University of California San Francisco, United States','Research mentor: Donna M. Ferriero')
  sec('LICENSURE AND PROFESSIONAL QUALIFICATIONS')
- for line in ['ECFMG Certification - Educational Commission for Foreign Medical Graduates, United States, 2026','USMLE Step 3 - Scheduled','Associate Senior Professional Title in Research (Associate Researcher), Zhejiang Province, China, 2025','Intermediate Professional Qualification in Anesthesiology, China, 2024','Physician Qualification Certificate and Physician Practice Certificate, China, 2016']:add(xml_escape(line))
- sec('HONORS AND AWARDS')
- add('One of 10 abstracts selected for the Best of Abstracts: Basic Science oral session from more than 1,000 submissions, American Society of Anesthesiologists Annual Meeting, 2019.')
- sec('PATENT')
- add('Sun D, Luo G, Yao Y, Yan M. Continuous oxygen saturation monitoring probe for insertion into a central venous catheter. Chinese Utility Model Patent, ZL 2024 2 3305545.1. Granted April 21, 2026.')
- add('A probe designed for placement within a central venous catheter to continuously monitor central venous oxygen saturation (ScvO2), intended to support real-time assessment of the balance between oxygen delivery and consumption.')
+ for line in QUALIFICATIONS:add(xml_escape(line))
  story.append(PageBreak())
  sec('PROFESSIONAL EXPERIENCE')
  entry('November 2024 - Present','Associate Researcher',INSTITUTION.replace('’',"'")+', Hangzhou, China','Research on cerebral ischemia and neuroprotection, with a focus on autophagy and mitophagy.')
  entry('September 2023 - October 2024','Anesthesiologist',HOSPITAL+', Hangzhou, China')
- for s in ['Provided perioperative anesthesia care across a broad range of surgical procedures, with senior consultation for complex or high-risk cases.','Staffed the preoperative anesthesia clinic: evaluation, risk assessment, patient optimization, and anesthetic planning.','Helped establish the preoperative anesthesia clinic, including patient screening criteria and assessment workflows.','Supported clinic IT system optimization, critical-value alerts and escalation processes, and preoperative communication across departments.','Managed induction, intraoperative monitoring and management, emergence, and postoperative handoff.','Performed ultrasound-guided regional anesthesia and vascular access, including major peripheral nerve blocks, arterial catheterization, and central venous access.','Participated in operating-room orientation and case-based teaching for international medical students at Zhejiang University.']:add('- '+s)
- sec('U.S. CLINICAL OBSERVERSHIP')
- entry('November 2026 - Four weeks','Clinical Observer','University of Utah Hospital, United States','Department of Anesthesiology, Perioperative & Pain Medicine')
- entry('October 2026 - Four weeks','Clinical Observer','Torrance Memorial Hospital, Torrance, California, United States','Department of Anesthesiology')
+ for s in ['Provided perioperative anesthesia care, including induction, intraoperative management, emergence, and postoperative handoff, with senior consultation for complex cases.','Staffed and helped establish the preoperative anesthesia clinic, including patient screening, risk assessment, patient optimization, and assessment workflows.','Supported clinic IT optimization, critical-value alerts and escalation, and preoperative communication across departments.','Performed ultrasound-guided peripheral nerve blocks and vascular access; taught international medical students through operating-room orientation and case discussions.']:add('- '+s)
+ sec('U.S. CLINICAL OBSERVERSHIPS')
+ add('Observational focus: '+OBSERVER_FOCUS)
+ entry('November 2026 - Four weeks, planned','Clinical Observer','University of Utah Hospital, United States','Department of Anesthesiology, Perioperative & Pain Medicine')
+ entry('October 2026 - Four weeks, in progress','Clinical Observer','Torrance Memorial Hospital, Torrance, California, United States','Department of Anesthesiology')
  sec('RESEARCH FUNDING')
- entry('2024 - 2026','Principal Investigator - NSFC Young Scientists Fund','National Natural Science Foundation of China','Neuroprotection and mechanism of HIF-2α on immature brain hypoxic-ischemic injury by regulating mitophagy.')
+ entry('2024 - 2026','Principal Investigator - NSFC Young Scientists Fund','National Natural Science Foundation of China - Project No. 82302479',GRANT_TITLE+'.')
+ sec('PATENT')
+ add('<b>First inventor.</b> Sun D, Luo G, Yao Y, Yan M. Continuous oxygen saturation monitoring probe for insertion into a central venous catheter. Chinese Utility Model Patent, ZL 2024 2 3305545.1. Granted April 21, 2026.')
+ add('A probe designed for placement within a central venous catheter to continuously monitor central venous oxygen saturation (ScvO2), intended to help assess the balance between oxygen delivery and consumption in real time. A utility model protects a technical product design.')
+ story.append(PageBreak())
+ sec('CLINICAL EXPERIENCE IN NUMBERS')
+ add('Rounded residency records and estimated cumulative experience through October 2024. Categories overlap; no unique patient total is implied.','note')
+ for group in CLINICAL['groups']:
+  add('<b>'+xml_escape(group['title'])+'</b>')
+  rows=[[text('Category','cellhead'),text('Residency log<br/>~July 2023','cellhead'),text('Cumulative estimate<br/>October 2024','cellhead')]]
+  rows += [[text(xml_escape(row['label']),'cell'),text('~'+str(row['logged']),'cell'),text('~'+str(row['estimated']),'cell')] for row in group['rows']]
+  table=Table(rows,colWidths=[287,105,115],repeatRows=1,hAlign='LEFT')
+  table.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('BACKGROUND',(0,0),(-1,0),colors.HexColor('#edf1ed')),('LINEBELOW',(0,0),(-1,-1),0.35,colors.HexColor('#dde1de')),('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),('TOPPADDING',(0,0),(-1,-1),4),('BOTTOMPADDING',(0,0),(-1,-1),4)]))
+  story.append(table);story.append(Spacer(1,11))
+ add(xml_escape(CLINICAL['methodology']),'note')
+ sec('SCIENTIFIC PRESENTATIONS AND HONORS')
+ for y,title,authors,where in PRESENTATIONS:story.append(KeepTogether([text(xml_escape(y+'. '+authors+' '+title+' '+where+'.'))]))
  story.append(PageBreak())
  sec('PEER-REVIEWED PUBLICATIONS')
  add('Ordered by CV publication year, including online-first dates. First, co-first, and corresponding authorship are marked.','note')
@@ -276,13 +340,11 @@ def build_cv():
   if p['role']:s+=f' <font color="#bf391b"><b>({p["role"]})</b></font>'
   if p.get('doi'):s+=f' DOI: <link href="https://doi.org/{xml_escape(p["doi"])}">{xml_escape(p["doi"])}</link>.'
   story.append(KeepTogether([text(s,'pub')]))
- sec('SELECTED SCIENTIFIC PRESENTATIONS')
- for y,title,authors,where in PRESENTATIONS:add(xml_escape(y+'. '+authors+' '+title+' '+where+'.'))
  sec('PROFESSIONAL SERVICE AND LEADERSHIP')
- add('<b>Volunteer Service - Ad Hoc Peer Reviewer, 2024 - Present</b><br/>Completed 53 peer-review assignments across 17 journals, as of September 2026, including ' + ', '.join(REVIEW_JOURNALS[:-1]) + ', and ' + REVIEW_JOURNALS[-1] + '.')
+ add('<b>Volunteer Service - Ad Hoc Peer Reviewer, 2024 - Present</b><br/>Completed 53 peer-review assignments across 17 journals, as of September 2026, including ' + ', '.join(REVIEW_HIGHLIGHTS) + ', and 12 other journals.')
  add('<b>President, Graduate Student Union</b>, Shanghai Jiao Tong University Affiliated Sixth Hospital, China, 2017 - 2018.')
  add('<b>Vice President, Student Union</b>, Wenzhou Medical University, China, 2014 - 2015.')
- add('Public CV updated October 14, 2026. Based on the September 2026 CV; observerships and clinic contributions updated from information supplied by Dawei Sun.','note')
+ add('Updated October 2026','note')
  def page(canvas,doc):
   canvas.saveState();w,h=A4
   canvas.setStrokeColor(colors.HexColor('#d8ded8'));canvas.line(44,40,w-44,40)
