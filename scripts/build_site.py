@@ -18,8 +18,15 @@ TRAINING = [
 ]
 PRESENTATIONS = [
     ('2024', 'Arterial-venous oxygen difference as a potential indicator for erythrocyte transfusion during cardiac surgery: a prospective observational study.', 'Sun D, Yao Y, Yan M.', 'Selected for oral presentation · American Society of Anesthesiologists Annual Meeting · Philadelphia, PA'),
-    ('2019', 'Angiopep-2 modified PEGylated 2-methoxyestradiol micelles contributes to neuroprotection in a murine cardiac arrest model.', 'Sun D, Wang X, Hu Y, Cui D.', 'Best of Abstracts: Basic Science · American Society of Anesthesiologists Annual Meeting · Orlando, FL'),
+    ('2019', 'Angiopep-2 modified PEGylated 2-methoxyestradiol micelles contributes to neuroprotection in a murine cardiac arrest model.', 'Sun D, Wang X, Hu Y, Cui D.', 'Oral presentation · Best of Abstracts: Basic Science · American Society of Anesthesiologists Annual Meeting · Orlando, FL'),
 ]
+
+
+BIOGRAPHY = ('I am an anesthesiologist and clinical researcher with doctoral training at Shanghai Jiao Tong University, '
+             'a clinical postdoctoral fellowship and anesthesiology residency at Zhejiang University, and visiting research experience at UCSF. '
+             'I am currently an Associate Researcher in Hangzhou, where I study cerebral ischemia and neuroprotection. '
+             'My background combines clinical anesthesia with basic and clinical research in perioperative medicine.')
+REVIEW_JOURNALS = ['International Journal of Surgery', 'Anesthesiology and Perioperative Science', 'Journal of Clinical Anesthesia', 'Drug Design, Development and Therapy', 'International Journal of Molecular Sciences', 'Journal of Clinical Medicine', 'Brazilian Journal of Anesthesiology', 'Abdominal Radiology', 'Anesthesia Research', 'Biomedicines', 'Emergency Care and Medicine', 'Healthcare', 'Journal of Anesthesia and Translational Medicine', 'Journal of Personalized Medicine', 'Journal of Vascular Diseases', 'Methods and Protocols', 'Open Medicine']
 
 
 def author_html(authors):
@@ -109,15 +116,17 @@ hero = f'''<body>{header()}
 <a class="hero-email" href="mailto:{EMAIL}">{EMAIL}</a>
 <div class="buttons"><a class="button" href="{CV}">Download CV <span aria-hidden="true">↓</span></a></div>
 </div>{portrait_html}
+<p class="bio">{E(BIOGRAPHY)}</p>
 </div></section>'''
 timeline = '<ol class="career-timeline">'
-timeline += timeline_entry('2010 – 2015', 'M.D. in Anesthesiology', 'Wenzhou Medical University', 'October 2010 – July 2015')
-timeline += timeline_entry('2015 – 2020', 'Ph.D. in Anesthesiology', 'Shanghai Jiao Tong University', 'September 2015 – June 2020')
-timeline += timeline_entry('2018 – 2019', 'Visiting Scholar', 'University of California San Francisco', 'Neurology &amp; Pediatrics · October 2018 – October 2019')
-timeline += timeline_entry('2020 – 2024', 'Clinical Postdoctoral Fellowship &amp; Residency', 'Zhejiang University', f'<span class="training-line">Clinical postdoctoral fellowship · September 2020 – February 2024</span><span class="training-line">Anesthesiology residency · September 2020 – August 2023<br>{HOSPITAL}</span>')
-timeline += timeline_entry('2023 – 2024', 'Anesthesiologist', HOSPITAL, 'September 2023 – October 2024')
-timeline += timeline_entry('2024 – Present', 'Associate Researcher', INSTITUTION, 'November 2024 – Present · Cerebral ischemia and neuroprotection, with a focus on autophagy and mitophagy.')
 timeline += timeline_entry('October 2026', 'Clinical Observership · Anesthesiology', 'Torrance Memorial Hospital · Torrance, California', 'Four-week clinical observership.')
+timeline += timeline_entry('November 2024 – Present', 'Associate Researcher', INSTITUTION, 'Cerebral ischemia and neuroprotection, with a focus on autophagy and mitophagy.')
+timeline += timeline_entry('September 2023 – October 2024', 'Anesthesiologist', HOSPITAL)
+timeline += timeline_entry('September 2020 – February 2024', 'Clinical Postdoctoral Fellow', 'Zhejiang University', 'Anesthesiology')
+timeline += timeline_entry('September 2020 – August 2023', 'Residency in Anesthesiology', HOSPITAL)
+timeline += timeline_entry('October 2018 – October 2019', 'Visiting Scholar', 'University of California San Francisco', 'Neurology &amp; Pediatrics')
+timeline += timeline_entry('September 2015 – June 2020', 'Ph.D. in Anesthesiology', 'Shanghai Jiao Tong University')
+timeline += timeline_entry('October 2010 – July 2015', 'M.D. in Anesthesiology', 'Wenzhou Medical University')
 timeline += '</ol>'
 clinical = '''<ul class="clinical-list">
 <li>Pre-anesthetic evaluation, perioperative risk assessment, and anesthetic planning.</li>
@@ -126,27 +135,36 @@ clinical = '''<ul class="clinical-list">
 <li>Operating-room orientation and case-based teaching for international medical students at Zhejiang University.</li>
 </ul>
 <div class="qualification" aria-label="Professional qualifications">
-<span>ECFMG Certification · 2026</span><span>USMLE Step 3 · Scheduled</span><span>Physician qualification &amp; practice certificates · China, 2016</span>
+<span>ECFMG Certification · 2026</span><span>USMLE Step 3 · Scheduled</span><span>Intermediate Professional Qualification in Anesthesiology · China, 2024</span>
 </div>'''
-research = '''<div class="research-list">
-<article><h3>Cerebral ischemia &amp; neuroprotection</h3><p>Mechanisms of ischemic brain injury, including the roles of HIF-2α, autophagy, and mitophagy in neuronal survival. Current research focuses on cerebral ischemia and hypoxic-ischemic injury in the immature brain.</p></article>
-<article><h3>Patient blood management &amp; oxygen delivery</h3><p>Clinical research exploring physiologic indicators of oxygen delivery and utilization to inform transfusion decisions in cardiac surgery, alongside studies of perioperative coagulation and blood conservation.</p></article>
-<article><h3>Clinical trials &amp; anesthetic drugs</h3><p>Randomized controlled trials evaluating the efficacy and safety of ciprofol, a novel intravenous anesthetic, and anesthetic strategies for postoperative cognitive recovery.</p></article>
-</div>'''
+research = '<p class="research-statement">' + (
+    'My research focuses on cerebral ischemia and neuroprotection, particularly the roles of autophagy, mitophagy, and HIF-2α in neuronal survival after hypoxic-ischemic injury. '
+    'My doctoral work and visiting research at UCSF provided a foundation in experimental neuroscience. '
+    'During clinical postdoctoral training, I also conducted prospective and retrospective studies of patient blood management and perioperative outcomes. '
+    'This work includes exploring physiologic indicators of oxygen delivery and utilization to inform transfusion decisions in cardiac surgery, as well as studies of blood conservation and coagulation. '
+    'I have also contributed as a corresponding author to randomized controlled trials of ciprofol, a novel intravenous anesthetic, and anesthetic strategies for postoperative cognitive recovery.'
+) + '</p>'
 all_papers = sorted(PUBS, key=lambda p: (p['year'], p['id']), reverse=True)
 publications = '<p class="section-note">First, co-first, and corresponding authorship are indicated after each citation.</p><ol class="publications-list">' + ''.join(paper(p) for p in all_papers) + '</ol>'
-contributions = '''<dl class="academic-list">
+asa_presentations = ''.join(
+    f'<div class="service-presentation"><strong>Oral presentation · {year}'
+    + (' · Best of Abstracts: Basic Science' if year == '2019' else '')
+    + f'</strong><p>{E(title)}</p></div>'
+    for year, title, _, _ in PRESENTATIONS)
+journal_list = '<ul class="journal-list">' + ''.join(f'<li><em>{E(journal)}</em></li>' for journal in REVIEW_JOURNALS) + '</ul>'
+contributions = f'''<dl class="academic-list">
 <div><dt>Research funding</dt><dd><strong>NSFC Young Scientists Fund · Principal Investigator, 2024–2026</strong><p>HIF-2α-mediated neuroprotection and the regulation of mitophagy in immature hypoxic-ischemic brain injury.</p></dd></div>
-<div><dt>ASA presentations</dt><dd><strong>Best of Abstracts: Basic Science · 2019</strong><p>Neuroprotection in a murine cardiac arrest model.</p><strong>Selected oral presentation · 2024</strong><p>Arterial-venous oxygen difference and transfusion during cardiac surgery.</p></dd></div>
+<div><dt>ASA presentations</dt><dd>{asa_presentations}</dd></div>
 <div><dt>Patent</dt><dd><strong>Continuous oxygen saturation monitoring probe</strong><p>Co-inventor · Chinese Utility Model Patent ZL 2024 2 3305545.1. Granted April 21, 2026.</p></dd></div>
-<div><dt>Peer review</dt><dd><p>53 assignments across 17 journals, as of September 2026, including <em>International Journal of Surgery</em>, <em>Journal of Clinical Anesthesia</em>, and <em>Anesthesiology and Perioperative Science</em>.</p></dd></div>
+<div><dt>Volunteer service</dt><dd><strong>Ad Hoc Peer Reviewer · 2024–Present</strong><p>53 peer-review assignments across 17 journals, as of September 2026. Journals include:</p>{journal_list}</dd></div>
+<div><dt>Leadership</dt><dd><strong>President, Graduate Student Union · 2017–2018</strong><p>Shanghai Jiao Tong University Affiliated Sixth Hospital</p><strong>Vice President, Student Union · 2014–2015</strong><p>Wenzhou Medical University</p></dd></div>
 </dl>'''
 home = head('Dawei Sun, M.D., Ph.D. | Anesthesiologist & Clinical Researcher', 'Education, clinical experience, research, publications, and curriculum vitae of Dawei Sun, M.D., Ph.D.') + hero
 home += section('training', 'Education &amp; Experience', timeline)
 home += section('clinical', 'Clinical Experience', clinical)
 home += section('research', 'Research', research)
 home += section('publications', 'Publications', publications)
-home += section('contributions', 'Academic Service &amp; Recognition', contributions)
+home += section('contributions', 'Academic Service &amp; Leadership', contributions)
 home += '</main>' + footer()
 (ROOT / 'index.html').write_text(home)
 
@@ -224,8 +242,8 @@ def build_cv():
   if p.get('doi'):s+=f' DOI: <link href="https://doi.org/{xml_escape(p["doi"])}">{xml_escape(p["doi"])}</link>.'
   story.append(KeepTogether([text(s,'pub')]))
  sec('PROFESSIONAL SERVICE AND LEADERSHIP')
- add('<b>Ad Hoc Peer Reviewer, 2024 - Present</b><br/>Completed 53 peer-review assignments across 17 journals, as of September 2026, including International Journal of Surgery, Anesthesiology and Perioperative Science, Journal of Clinical Anesthesia, Drug Design, Development and Therapy, International Journal of Molecular Sciences, Journal of Clinical Medicine, and Brazilian Journal of Anesthesiology.')
- add('<b>President, Graduate Union</b>, Shanghai Jiao Tong University Affiliated Sixth Hospital, China, 2017 - 2018.')
+ add('<b>Volunteer Service - Ad Hoc Peer Reviewer, 2024 - Present</b><br/>Completed 53 peer-review assignments across 17 journals, as of September 2026, including ' + ', '.join(REVIEW_JOURNALS[:-1]) + ', and ' + REVIEW_JOURNALS[-1] + '.')
+ add('<b>President, Graduate Student Union</b>, Shanghai Jiao Tong University Affiliated Sixth Hospital, China, 2017 - 2018.')
  add('<b>Vice President, Student Union</b>, Wenzhou Medical University, China, 2014 - 2015.')
  sec('DOCUMENT INFORMATION')
  add('Public CV updated October 14, 2026. Based on the September 8, 2026 CV; Torrance Memorial Hospital observership added from information supplied by Dawei Sun. Qualification status, four-week observership duration, and current cerebral ischemia research focus confirmed by Dawei Sun in October 2026.','note')

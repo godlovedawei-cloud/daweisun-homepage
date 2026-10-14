@@ -1,6 +1,6 @@
 # Dawei Sun — academic website
 
-English physician academic homepage with a chronological education and experience timeline and all 24 publications on the homepage.
+English physician academic homepage with a reverse chronological education and experience timeline and all 24 publications on the homepage.
 
 - Live site: https://daweisun.com
 - Hosting: GitHub Pages, root of `main`; DNS remains unchanged.
@@ -47,3 +47,10 @@ Bibliography checks:
 ## Verification
 
 Check desktop/tablet/mobile layouts, keyboard skip navigation, anchor targets, all local asset URLs, publication counts, author highlighting, and PDF download. Extract text from the public PDF to check phone removal, qualification wording, observership wording, and paper count; render every page to inspect pagination and glyphs.
+
+
+## October 14 refinements
+
+The biography and single-paragraph research statement draw on the owner’s December 2025 personal statement, subject to the newer clarification about current cerebral ischemia work. Timeline dates appear once per entry; postdoctoral and residency training are separate because their end dates differ. The homepage qualification label uses the exact Chinese intermediate anesthesiology professional qualification from 2024 and makes no equivalence claim to U.S. board certification. Both ASA presentations are identified as oral presentations on the owner’s confirmation.
+
+The 17 peer-review journal names combine 16 valid journal names from the owner’s review-tracking workbook with Drug Design, Development and Therapy from the September 2026 CV. The workbook’s date-only footer is excluded. Its 52 review rounds reflect the older tracking file; the public figure remains 53 assignments as of September 2026 from the newer CV. No manuscript titles or individual review details are published. Peer review is grouped as volunteer service, and the student-union roles are listed under leadership.
