@@ -1,6 +1,6 @@
 # Dawei Sun — academic website
 
-English academic homepage for clinical anesthesiology fellowship conversations and professional introductions.
+English physician academic homepage with a chronological education and experience timeline and all 24 publications on the homepage.
 
 - Live site: https://daweisun.com
 - Hosting: GitHub Pages, root of `main`; DNS remains unchanged.
@@ -32,7 +32,7 @@ Push reviewed changes to `main` to publish automatically. Confirm the GitHub Pag
 
 ## Content provenance — October 14, 2026
 
-Primary source: September 2026 CV, supplemented by the owner’s confirmation of ECFMG certification, scheduled Step 3, current appointment, and October 2026 Torrance Memorial Hospital anesthesiology observership. Observership completion status is not asserted. Utah is omitted pending details. Current clinical interests are owner-supplied; no fellowship admission or U.S. clinical licensure is claimed.
+Primary source: September 2026 CV, supplemented by the owner’s confirmation of ECFMG certification, scheduled Step 3, current appointment, and October 2026 Torrance Memorial Hospital anesthesiology observership. Observership completion status is not asserted. Utah is omitted pending details. The owner confirmed a four-week Torrance observership and clarified that the current Associate Researcher role focuses on cerebral ischemia, rather than patient blood management. Explicit application intentions and clinical-interest statements are omitted. No fellowship admission or U.S. clinical licensure is claimed.
 
 The public CV omits the phone number, retains all 24 publications, and adds the owner-supplied observership with a document note. Original source PDFs remain untouched outside the repository.
 
