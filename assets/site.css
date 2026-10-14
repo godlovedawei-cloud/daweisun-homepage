@@ -191,3 +191,24 @@ p { margin-bottom: 13px; }
 .journal-list { columns: 2; column-gap: 28px; }
 .journal-list li { break-inside: avoid; }
 @media (max-width: 900px) { .journal-list { columns: 1; } }
+
+/* Documentary clinical photographs accompany the corresponding experience. */
+.clinic-development { margin-top: 30px; max-width: 850px; }
+.clinic-development h3 { font-size: 18px; margin-bottom: 12px; }
+.clinic-development p, .clinic-development li { color: var(--muted); font-size: 14px; }
+.clinic-development ul { padding-left: 20px; margin: 10px 0 0; }
+.clinic-development li { padding-left: 3px; margin-bottom: 4px; }
+.clinical-gallery { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 25px; margin: 30px 0; }
+.clinical-photo { margin: 0; min-width: 0; }
+.clinical-photo img { display: block; width: 100%; height: 230px; object-fit: contain; object-position: center; }
+.clinical-photo figcaption { margin-top: 13px; line-height: 1.65; }
+.clinical-photo figcaption strong { display: block; font-size: 13px; font-weight: 500; }
+.clinical-photo figcaption span { display: block; color: var(--muted); font-size: 12px; margin-top: 4px; }
+@media (max-width: 900px) { .clinical-photo img { height: 190px; } }
+@media (max-width: 600px) {
+  .clinical-gallery { grid-template-columns: 1fr; gap: 28px; }
+  .clinical-photo img { height: auto; max-height: 330px; }
+  .clinical-photo figcaption { margin-top: 10px; }
+  .clinic-development h3 { font-size: 16px; }
+}
+@media print { .clinical-gallery { break-inside: avoid; } .clinical-photo img { height: 150px; } }

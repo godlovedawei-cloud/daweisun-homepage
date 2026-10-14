@@ -24,8 +24,9 @@ PRESENTATIONS = [
 
 BIOGRAPHY = ('I am an anesthesiologist and clinical researcher with doctoral training at Shanghai Jiao Tong University, '
              'a clinical postdoctoral fellowship and anesthesiology residency at Zhejiang University, and visiting research experience at UCSF. '
-             'I am currently an Associate Researcher in Hangzhou, where I study cerebral ischemia and neuroprotection. '
-             'My background combines clinical anesthesia with basic and clinical research in perioperative medicine.')
+             'I am currently an Associate Researcher in Hangzhou, where my research focuses on cerebral ischemia and neuroprotection. '
+             'My background combines clinical anesthesia with basic and clinical research in perioperative medicine. '
+             'My clinical experience also includes helping establish a preoperative anesthesia clinic and improve its workflows.')
 REVIEW_JOURNALS = ['International Journal of Surgery', 'Anesthesiology and Perioperative Science', 'Journal of Clinical Anesthesia', 'Drug Design, Development and Therapy', 'International Journal of Molecular Sciences', 'Journal of Clinical Medicine', 'Brazilian Journal of Anesthesiology', 'Abdominal Radiology', 'Anesthesia Research', 'Biomedicines', 'Emergency Care and Medicine', 'Healthcare', 'Journal of Anesthesia and Translational Medicine', 'Journal of Personalized Medicine', 'Journal of Vascular Diseases', 'Methods and Protocols', 'Open Medicine']
 
 
@@ -119,11 +120,12 @@ hero = f'''<body>{header()}
 <p class="bio">{E(BIOGRAPHY)}</p>
 </div></section>'''
 timeline = '<ol class="career-timeline">'
-timeline += timeline_entry('October 2026', 'Clinical Observership · Anesthesiology', 'Torrance Memorial Hospital · Torrance, California', 'Four-week clinical observership.')
+timeline += timeline_entry('November 2026', 'Clinical Observer', 'University of Utah<br>Department of Anesthesiology, Perioperative &amp; Pain Medicine', 'Four-week clinical observership · Upcoming.')
+timeline += timeline_entry('October 2026', 'Clinical Observer', 'Torrance Memorial Hospital<br>Department of Anesthesiology · Torrance, California', 'Four-week clinical observership.')
 timeline += timeline_entry('November 2024 – Present', 'Associate Researcher', INSTITUTION, 'Cerebral ischemia and neuroprotection, with a focus on autophagy and mitophagy.')
-timeline += timeline_entry('September 2023 – October 2024', 'Anesthesiologist', HOSPITAL)
+timeline += timeline_entry('September 2023 – October 2024', 'Anesthesiologist', HOSPITAL, 'Contributed to establishing the preoperative anesthesia clinic and improving its workflows.')
 timeline += timeline_entry('September 2020 – February 2024', 'Clinical Postdoctoral Fellow', 'Zhejiang University', 'Anesthesiology')
-timeline += timeline_entry('September 2020 – August 2023', 'Residency in Anesthesiology', HOSPITAL)
+timeline += timeline_entry('September 2020 – August 2023', 'Residency in Anesthesiology', HOSPITAL, 'Training included an intensive care unit (ICU) rotation.')
 timeline += timeline_entry('October 2018 – October 2019', 'Visiting Scholar', 'University of California San Francisco', 'Neurology &amp; Pediatrics')
 timeline += timeline_entry('September 2015 – June 2020', 'Ph.D. in Anesthesiology', 'Shanghai Jiao Tong University')
 timeline += timeline_entry('October 2010 – July 2015', 'M.D. in Anesthesiology', 'Wenzhou Medical University')
@@ -134,6 +136,30 @@ clinical = '''<ul class="clinical-list">
 <li>Ultrasound-guided peripheral nerve blocks and vascular access, including arterial catheterization and central venous access.</li>
 <li>Operating-room orientation and case-based teaching for international medical students at Zhejiang University.</li>
 </ul>
+<article class="clinic-development" id="clinic-development">
+<h3>Preoperative Clinic Development &amp; Workflow Improvement</h3>
+<p>At the Second Affiliated Hospital, Zhejiang University School of Medicine, I helped establish the preoperative anesthesia clinic and supported its implementation. My contributions included:</p>
+<ul>
+<li>Defining patient screening criteria and preoperative assessment workflows.</li>
+<li>Supporting IT system optimization to improve clinic workflows.</li>
+<li>Helping develop critical-value alerts and escalation processes.</li>
+<li>Coordinating preoperative communication across clinical departments.</li>
+</ul>
+</article>
+<div class="clinical-gallery" aria-label="Clinical teaching, residency training, and clinic work">
+<figure class="clinical-photo">
+<img src="/assets/clinical/teaching.jpg" width="1400" height="1050" loading="lazy" decoding="async" alt="Dawei Sun demonstrating airway management using a training mannequin with students.">
+<figcaption><strong>Clinical teaching</strong><span>Simulation-based teaching at Zhejiang University.</span></figcaption>
+</figure>
+<figure class="clinical-photo" id="icu-training-photo">
+<img src="/assets/clinical/icu-residency.jpg" width="500" height="1000" loading="lazy" decoding="async" alt="Dawei Sun during an intensive care unit rotation as part of anesthesiology residency.">
+<figcaption><strong>Residency training</strong><span>Intensive care unit rotation during anesthesiology residency.</span></figcaption>
+</figure>
+<figure class="clinical-photo">
+<img src="/assets/clinical/preoperative-clinic.jpg" width="465" height="435" loading="lazy" decoding="async" alt="Dawei Sun working in the preoperative anesthesia clinic.">
+<figcaption><strong>Preoperative anesthesia clinic</strong><span>Clinical work at the Second Affiliated Hospital, Zhejiang University School of Medicine.</span></figcaption>
+</figure>
+</div>
 <div class="qualification" aria-label="Professional qualifications">
 <span>ECFMG Certification · 2026</span><span>USMLE Step 3 · Scheduled</span><span>Intermediate Professional Qualification in Anesthesiology · China, 2024</span>
 </div>'''
@@ -197,7 +223,7 @@ def build_cv():
  'sub':ParagraphStyle('sub',fontName='CV',fontSize=10,leading=15,textColor=colors.HexColor('#53636c'),spaceAfter=7),
  'section':ParagraphStyle('section',fontName='CV-Bold',fontSize=11,leading=15,textColor=colors.HexColor('#326b5c'),spaceBefore=16,spaceAfter=9,keepWithNext=True),
  'body':ParagraphStyle('body',fontName='CV',fontSize=9.5,leading=14,spaceAfter=7),
- 'pub':ParagraphStyle('pub',fontName='CV',fontSize=8.8,leading=12.8,spaceAfter=10),
+ 'pub':ParagraphStyle('pub',fontName='CV',fontSize=8.8,leading=12.8,spaceAfter=8),
  'note':ParagraphStyle('note',fontName='CV',fontSize=8,leading=11,textColor=colors.HexColor('#53636c'),spaceAfter=8)}
  story=[]
  def text(s,style='body'):return Paragraph(re.sub('[\u2010-\u2015]', '-', s.replace('Ⅺ','XI')),styles[style])
@@ -212,7 +238,7 @@ def build_cv():
  add(f'<link href="mailto:{EMAIL}">{EMAIL}</link> | <link href="https://daweisun.com">daweisun.com</link>','sub')
  sec('EDUCATION AND TRAINING')
  for _,role,inst,date in TRAINING:
-  entry(date,role.replace('·','-'),inst)
+  entry(date,role.replace('·','-'),inst,'Training included an intensive care unit (ICU) rotation.' if role.startswith('Residency') else '')
   if role.startswith('Ph.D.'):
    entry('October 2018 - October 2019','Visiting Scholar - Neurology and Pediatrics','University of California San Francisco, United States')
  sec('LICENSURE AND PROFESSIONAL QUALIFICATIONS')
@@ -221,17 +247,16 @@ def build_cv():
  sec('PROFESSIONAL EXPERIENCE')
  entry('November 2024 - Present','Associate Researcher',INSTITUTION.replace('’',"'")+', Hangzhou, China','Research on cerebral ischemia and neuroprotection, with a focus on autophagy and mitophagy.')
  entry('September 2023 - October 2024','Anesthesiologist',HOSPITAL+', Hangzhou, China')
- for s in ['Provided perioperative anesthesia care across a broad range of surgical procedures, with senior consultation for complex or high-risk cases.','Staffed the preoperative anesthesia clinic: evaluation, risk assessment, patient optimization, and anesthetic planning.','Managed induction, intraoperative monitoring and management, emergence, and postoperative handoff.','Performed ultrasound-guided regional anesthesia and vascular access, including major peripheral nerve blocks, arterial catheterization, and central venous access.','Participated in operating-room orientation and case-based teaching for international medical students at Zhejiang University.']:add('- '+s)
+ for s in ['Provided perioperative anesthesia care across a broad range of surgical procedures, with senior consultation for complex or high-risk cases.','Staffed the preoperative anesthesia clinic: evaluation, risk assessment, patient optimization, and anesthetic planning.','Helped establish the preoperative anesthesia clinic, including patient screening criteria and assessment workflows.','Supported clinic IT system optimization, critical-value alerts and escalation processes, and preoperative communication across departments.','Managed induction, intraoperative monitoring and management, emergence, and postoperative handoff.','Performed ultrasound-guided regional anesthesia and vascular access, including major peripheral nerve blocks, arterial catheterization, and central venous access.','Participated in operating-room orientation and case-based teaching for international medical students at Zhejiang University.']:add('- '+s)
  sec('U.S. CLINICAL OBSERVERSHIP')
- entry('October 2026 - Four weeks','Clinical Observership - Anesthesiology','Torrance Memorial Hospital, Torrance, California, United States')
+ entry('November 2026 - Four weeks - Upcoming','Clinical Observer','University of Utah, United States','Department of Anesthesiology, Perioperative & Pain Medicine')
+ entry('October 2026 - Four weeks','Clinical Observer','Torrance Memorial Hospital, Torrance, California, United States','Department of Anesthesiology')
  sec('RESEARCH FUNDING')
  entry('2024 - 2026','Principal Investigator - NSFC Young Scientists Fund','National Natural Science Foundation of China','Neuroprotection and mechanism of HIF-2α on immature brain hypoxic-ischemic injury by regulating mitophagy.')
  sec('HONORS AND AWARDS')
  add('Best of Abstracts: Basic Science, American Society of Anesthesiologists Annual Meeting, 2019.')
  sec('PATENT')
  add('Sun D, Luo G, Yao Y, Yan M. Continuous oxygen saturation monitoring probe for insertion into a central venous catheter. Chinese Utility Model Patent, ZL 2024 2 3305545.1. Granted April 21, 2026.')
- sec('SELECTED SCIENTIFIC PRESENTATIONS')
- for y,title,authors,where in PRESENTATIONS:add(xml_escape(y+'. '+authors+' '+title+' '+where+'.'))
  story.append(PageBreak())
  sec('PEER-REVIEWED PUBLICATIONS')
  add('Ordered by CV publication year, including online-first dates. First, co-first, and corresponding authorship are marked.','note')
@@ -241,12 +266,13 @@ def build_cv():
   if p['role']:s+=f' <b>({p["role"]})</b>'
   if p.get('doi'):s+=f' DOI: <link href="https://doi.org/{xml_escape(p["doi"])}">{xml_escape(p["doi"])}</link>.'
   story.append(KeepTogether([text(s,'pub')]))
+ sec('SELECTED SCIENTIFIC PRESENTATIONS')
+ for y,title,authors,where in PRESENTATIONS:add(xml_escape(y+'. '+authors+' '+title+' '+where+'.'))
  sec('PROFESSIONAL SERVICE AND LEADERSHIP')
  add('<b>Volunteer Service - Ad Hoc Peer Reviewer, 2024 - Present</b><br/>Completed 53 peer-review assignments across 17 journals, as of September 2026, including ' + ', '.join(REVIEW_JOURNALS[:-1]) + ', and ' + REVIEW_JOURNALS[-1] + '.')
  add('<b>President, Graduate Student Union</b>, Shanghai Jiao Tong University Affiliated Sixth Hospital, China, 2017 - 2018.')
  add('<b>Vice President, Student Union</b>, Wenzhou Medical University, China, 2014 - 2015.')
- sec('DOCUMENT INFORMATION')
- add('Public CV updated October 14, 2026. Based on the September 8, 2026 CV; Torrance Memorial Hospital observership added from information supplied by Dawei Sun. Qualification status, four-week observership duration, and current cerebral ischemia research focus confirmed by Dawei Sun in October 2026.','note')
+ add('Public CV updated October 14, 2026. Based on the September 2026 CV; observerships and clinic contributions updated from information supplied by Dawei Sun.','note')
  def page(canvas,doc):
   canvas.saveState();w,h=A4
   canvas.setStrokeColor(colors.HexColor('#d8ded8'));canvas.line(44,40,w-44,40)

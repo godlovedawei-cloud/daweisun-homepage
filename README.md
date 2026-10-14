@@ -54,3 +54,11 @@ Check desktop/tablet/mobile layouts, keyboard skip navigation, anchor targets, a
 The biography and single-paragraph research statement draw on the owner’s December 2025 personal statement, subject to the newer clarification about current cerebral ischemia work. Timeline dates appear once per entry; postdoctoral and residency training are separate because their end dates differ. The homepage qualification label uses the exact Chinese intermediate anesthesiology professional qualification from 2024 and makes no equivalence claim to U.S. board certification. Both ASA presentations are identified as oral presentations on the owner’s confirmation.
 
 The 17 peer-review journal names combine 16 valid journal names from the owner’s review-tracking workbook with Drug Design, Development and Therapy from the September 2026 CV. The workbook’s date-only footer is excluded. Its 52 review rounds reflect the older tracking file; the public figure remains 53 assignments as of September 2026 from the newer CV. No manuscript titles or individual review details are published. Peer review is grouped as volunteer service, and the student-union roles are listed under leadership.
+
+## Clinical service and photographs
+
+Owner-supplied updates include participation in establishing the preoperative anesthesia clinic: patient screening criteria, assessment workflows, clinic IT optimization, critical-value notifications/escalation, and communication across departments. Wording reflects a contributing role and does not assert a formal management appointment or quantified operational results. ICU rotation is recorded within anesthesiology residency.
+
+The Torrance role is Clinical Observer in the Department of Anesthesiology (October 2026, four weeks). The owner confirmed a University of Utah Clinical Observer placement for November 2026 (four weeks, upcoming), with the supplied department name Department of Anesthesiology, Perioperative & Pain Medicine.
+
+Three owner-provided documentary photos appear in the clinical section. ICU and clinic photos are cropped to exclude the patient and clinical information; the original clinical photos are not committed or served. Exported web assets omit EXIF metadata. The teaching caption does not infer students’ nationality. No patient identifiers or clinical records are included in captions or alternative text.
