@@ -7,7 +7,7 @@ English physician academic homepage with a reverse chronological education and e
 - Hosting: GitHub Pages, root of `main`; DNS remains unchanged.
 - Pages: `index.html` and `publications.html`.
 - Public CV: `assets/Dawei-Sun-CV.pdf`. Original CVs and clinical logs remain outside the repository.
-- Styles: `assets/site.css`; no JavaScript, analytics, external fonts, or backend.
+- Styles: `assets/site.css`; academic pages have no JavaScript. The anesthesia tool uses local JavaScript and an isolated offline worker. No analytics, external fonts, or backend.
 
 ## Preview and build
 
@@ -69,3 +69,15 @@ The owner supplied residency rotations in emergency medicine, intensive care, ca
 ## Homepage introduction — October 28, 2026
 
 The homepage introduction uses the five English paragraphs supplied by the owner, including physician-scientist identity, more than 1,500 residency cases, the 344-patient ciprofol trial, cardiac-surgery oxygen research, UK Biobank studies, and explicit U.S. fellowship intent. Wording is owner-supplied. This introduction update does not modify the public CV. Paragraph spacing preserves readability on mobile and desktop.
+
+## Anesthesia Dose Quick Reference — October 28, 2026
+
+The first homepage Tools entry opens `/tools/anesthesia-dosing/`, a self-contained English reference for adults with obesity, adapted from the owner's supplied Netlify export. All calculator assets, icons, formulas, and drug tables live in that directory. The existing icons are reused. The original eight dose/ventilation results and drug weight reference are retained. IBW (Devine inch formula) and PBW (centimeter formula) are calculated separately; tidal volume uses PBW. Unit conversions use exact 2.54 cm/in and 0.45359237 kg/lb, and only display values are rounded. Reversal indications are clarified from BRIDION prescribing information; the original ambiguous TCI instruction is replaced by model-specific guidance. Links to the cited rocuronium and succinylcholine studies are verified and repaired. This is an adaptation of the original reference, not a new clinical validation study.
+
+Safari installation: open the tool, Share → Add to Home Screen, then open the new icon once while online and wait for **Ready for offline use**. The complete calculator, tables, formulas, and records then work without a connection. External source links and the personal homepage still require a connection. Clearing website data or browser/system eviction can remove offline files and records. Actual iPhone Home Screen installation and airplane-mode behavior require a real-device check; automated verification uses Chromium mobile viewports and network-offline mode.
+
+The app starts blank and retains up to 100 case records in browser localStorage under `daweisun.anesthesia-dosing.patients.v1`; five recent records appear in the dropdown, with the rest in Archive. At capacity, the oldest record is replaced. The old Netlify origin's records do not transfer automatically. No record contents are transmitted. If storage is blocked, calculations continue and an explicit message explains that records are temporary.
+
+The service worker's scope, manifest start URL, asset allowlist, and versioned cache prefix are limited to the tool. Installation is atomic: all assets must be cached before offline readiness is reported. First-download failures expose a retry; incomplete caches can be repaired. A new complete version waits for the user's update action, preserving saved inputs. Failed updates leave the existing offline version usable. Unrelated caches are never deleted.
+
+After editing tool assets, run `python3 scripts/build_anesthesia_tool.py` to refresh its deterministic offline version. `python3 scripts/build_site.py --pages-only` rebuilds the academic HTML and offline version without rewriting the public CV; the usual full build still generates the CV. Run `node scripts/test_anesthesia.mjs` for male/female golden cases, all eight results, PBW ventilation, conversions, invalid inputs, and the 120 kg boundary. Browser checks also cover 320/360/390/430/768/1280 px layouts, patient archives/reload, cold document starts offline, blocked storage, initial-install failure/retry, update failure and success, cache isolation, and recovery after a missing cached asset.

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Anesthesia Dose Quick Reference | Dawei Sun</title>
+<meta name="description" content="An offline anesthesia reference for adults with obesity: dosing weights, initial doses, ventilation, and local patient records.">
+<meta name="theme-color" content="#172c3d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Anesthesia Dosing">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="canonical" href="https://daweisun.com/tools/anesthesia-dosing/">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" href="./icon-192.png" type="image/png">
+<link rel="stylesheet" href="./style.css">
+<script type="module" src="./app.js"></script>
+</head>
+<body>
+<a class="skip" href="#calculator">Skip to calculator</a>
+<div class="wrap">
+<header class="intro">
+  <a class="back" href="/#tools">← Dawei Sun / Tools</a>
+  <p class="eyebrow">ADULT ANESTHESIA · OBESITY</p>
+  <h1>Anesthesia Dose<br>Quick Reference</h1>
+  <p class="subtitle">Dosing weights and initial doses. Titrate to effect.</p>
+  <nav class="jump" aria-label="Tool sections"><a href="#calculator">Calculator</a><a href="#d-h">Drug reference</a><a href="#formulas">Formulas</a></nav>
+</header>
+<aside class="offline-bar" aria-label="Offline availability">
+  <span id="offline-status" role="status">Preparing offline use…</span>
+  <button id="update-app" type="button" hidden>Update available</button>
+  <button id="retry-offline" type="button" hidden>Retry download</button>
+</aside>
+<section class="patient-panel" aria-labelledby="patient-heading">
+  <h2 id="patient-heading">Patient records</h2>
+  <div class="patient-row"><label class="sr" for="patient-select">Recent patients</label><select id="patient-select"></select><button class="primary" id="new-patient" type="button">+ New</button></div>
+  <label for="patient-label">Case label <span class="optional">(initials only)</span></label>
+  <input id="patient-label" type="text" maxlength="24" autocomplete="off" placeholder="Optional case label">
+  <div class="patient-meta"><span id="storage-status" role="status">Saved in this browser only</span><button id="archive-toggle" type="button" aria-expanded="false" aria-controls="archive">Archive <span id="archive-count">0</span></button></div>
+  <div id="archive" hidden></div>
+  <p class="fine">Recent 5 shown above. Up to 100 records kept on this device; oldest records are replaced when full.</p>
+</section>
+<main id="calculator" tabindex="-1">
+<section aria-labelledby="calculator-heading">
+  <div class="section-heading"><h2 id="calculator-heading">Calculator</h2><span class="eyebrow">01</span></div>
+  <label for="sex">Sex used in weight formulas</label>
+  <select id="sex"><option value="m">Male</option><option value="f">Female</option></select>
+  <fieldset><legend>Height</legend>
+    <div class="input-grid"><label for="cm">cm<input id="cm" type="number" inputmode="decimal" step="any" min="0"></label><label for="total-inches">Total inches<input id="total-inches" type="number" inputmode="decimal" step="any" min="0"></label></div>
+    <div class="input-grid feet-row"><label for="feet">Feet<input id="feet" type="number" inputmode="numeric" step="1" min="0"></label><label for="inches">Inches<input id="inches" type="number" inputmode="decimal" step="any" min="0" max="11.999999"></label></div>
+  </fieldset>
+  <fieldset><legend>Weight</legend><div class="input-grid"><label for="kg">kg<input id="kg" type="number" inputmode="decimal" step="any" min="0"></label><label for="lb">lb<input id="lb" type="number" inputmode="decimal" step="any" min="0"></label></div></fieldset>
+  <p id="input-message" class="input-message" role="status">Enter height and weight to calculate.</p>
+  <div class="weight-grid" aria-label="Calculated body weights">
+    <div class="weight"><span class="chip c-tbw">TBW</span><output id="tbw">—</output><small>Total body weight</small></div>
+    <div class="weight"><span class="chip c-ibw">IBW</span><output id="ibw">—</output><small>Ideal body weight</small></div>
+    <div class="weight"><span class="chip c-ibw">PBW</span><output id="pbw">—</output><small>Predicted body weight</small></div>
+    <div class="weight"><span class="chip c-lbw">LBW</span><output id="lbw">—</output><small>Lean body weight</small></div>
+    <div class="weight"><span class="chip c-adj">AdjBW</span><output id="adj">—</output><small>Adjusted body weight</small></div>
+    <div class="weight"><span class="chip c-none">BMI</span><output id="bmi">—</output><small>Body mass index · kg/m²</small></div>
+  </div>
+  <h3 class="dose-heading">Initial dose &amp; ventilation reference</h3>
+  <div id="doses" aria-live="polite" aria-atomic="true"><p class="muted">Results appear after valid height and weight are entered.</p></div>
+  <details class="clinical-notes"><summary>Reversal &amp; dosing notes</summary>
+    <p>Sugammadex uses actual body weight: 2 mg/kg at reappearance of T2; 4 mg/kg at 1–2 post-tetanic counts with no TOF response; 16 mg/kg for immediate reversal approximately 3 minutes after rocuronium 1.2 mg/kg. These are different indications, not interchangeable doses. Not recommended in severe renal impairment (CrCl &lt;30 mL/min).</p>
+    <p>Use quantitative neuromuscular monitoring. Rocuronium RSI here uses AdjBW, matching the original tool; protocols may use another scalar. Titrate anesthetics to response and account for age, comorbidities, and concurrent drugs.</p>
+    <p>6–8 mL/kg PBW is a ventilation reference, not a complete ventilator prescription; ARDS protocols generally start at 6 mL/kg PBW and require pressure-based adjustment.</p>
+  </details>
+</section>
+<section aria-labelledby="d-h">
+  <div class="section-heading"><h2 id="d-h">Drug weight reference</h2><span class="eyebrow">02</span></div>
+  <div class="table-scroll" tabindex="0" role="region" aria-label="Drug weight reference table"><table>
+    <thead><tr><th>Drug</th><th>Weight</th><th>Note</th></tr></thead>
+    <tbody>
+      <tr class="grp"><td colspan="3">Ventilation</td></tr>
+      <tr><td>Tidal volume</td><td><span class="chip c-ibw">PBW</span></td><td>6–8 mL/kg; ARDS 6</td></tr>
+      <tr class="grp"><td colspan="3">Hypnotics</td></tr>
+      <tr><td>Propofol induction</td><td><span class="chip c-lbw">LBW</span></td><td>Titrate induction to effect; TBW dosing may cause hypotension</td></tr>
+      <tr><td>Propofol infusion</td><td><span class="chip c-tbw">TBW</span> / <span class="chip c-adj">AdjBW</span></td><td>Titrate to clinical response and depth of anesthesia</td></tr>
+      <tr><td>Etomidate</td><td><span class="chip c-lbw">LBW</span></td><td>Limited data</td></tr>
+      <tr><td>Ketamine</td><td><span class="chip c-lbw">LBW</span> / <span class="chip c-ibw">IBW</span></td><td>Limited data</td></tr>
+      <tr><td>Midazolam</td><td>Bolus <span class="chip c-tbw">TBW</span>, infusion <span class="chip c-ibw">IBW</span></td><td>Use small increments, particularly with OSA</td></tr>
+      <tr><td>Dexmedetomidine</td><td><span class="chip c-lbw">LBW</span> / <span class="chip c-adj">AdjBW</span></td><td>Limited data</td></tr>
+      <tr class="grp"><td colspan="3">Opioids</td></tr>
+      <tr><td>Fentanyl, sufentanil</td><td><span class="chip c-lbw">LBW</span></td><td></td></tr>
+      <tr><td>Remifentanil</td><td><span class="chip c-lbw">LBW</span></td><td>TBW → bradycardia, hypotension</td></tr>
+      <tr><td>Morphine, hydromorphone</td><td><span class="chip c-ibw">IBW</span> / <span class="chip c-adj">AdjBW</span></td><td>Monitor if OSA</td></tr>
+      <tr class="grp"><td colspan="3">Neuromuscular blockers</td></tr>
+      <tr><td>Succinylcholine</td><td><span class="chip c-tbw">TBW</span></td><td>1 mg/kg</td></tr>
+      <tr><td>Rocuronium</td><td><span class="chip c-ibw">IBW</span> / <span class="chip c-lbw">LBW</span></td><td>TBW → prolonged block</td></tr>
+      <tr><td>Rocuronium RSI</td><td><span class="chip c-adj">AdjBW</span> / <span class="chip c-tbw">TBW</span></td><td>1.2 mg/kg; IBW = slower onset</td></tr>
+      <tr><td>Vecuronium</td><td><span class="chip c-ibw">IBW</span></td><td></td></tr>
+      <tr><td>Cisatracurium, atracurium</td><td><span class="chip c-ibw">IBW</span> / <span class="chip c-lbw">LBW</span></td><td>Use TOF</td></tr>
+      <tr class="grp"><td colspan="3">Reversal</td></tr>
+      <tr><td>Sugammadex</td><td><span class="chip c-tbw">TBW</span></td><td>2 / 4 / 16 mg/kg according to block depth and indication; see reversal notes above</td></tr>
+      <tr><td>Neostigmine</td><td><span class="chip c-none">Capped</span></td><td>0.03–0.07 mg/kg, max 5 mg</td></tr>
+      <tr class="grp"><td colspan="3">Other</td></tr>
+      <tr><td>Local anesthetics</td><td><span class="chip c-ibw">IBW</span> / <span class="chip c-lbw">LBW</span></td><td>Respect absolute max</td></tr>
+      <tr><td>Volatiles</td><td><span class="chip c-none">None</span></td><td>ET / MAC</td></tr>
+      <tr><td>Phenylephrine, norepinephrine</td><td><span class="chip c-none">Titrate</span></td><td>To MAP; check pump weight if μg/kg/min</td></tr>
+      <tr><td>Epinephrine</td><td><span class="chip c-none">Fixed</span></td><td>Route and dose depend on indication; follow the relevant resuscitation protocol</td></tr>
+      <tr><td>Cefazolin</td><td><span class="chip c-none">Fixed</span></td><td>2 g; 3 g if ≥ 120 kg</td></tr>
+      <tr><td>Vancomycin</td><td><span class="chip c-tbw">TBW</span></td><td>15 mg/kg</td></tr>
+      <tr><td>Heparin (UFH)</td><td><span class="chip c-tbw">TBW</span></td><td>Follow ACT</td></tr>
+    </tbody>
+  </table></div>
+</section>
+<section id="formulas" aria-labelledby="formula-heading">
+  <div class="section-heading"><h2 id="formula-heading">Weights &amp; formulas</h2><span class="eyebrow">03</span></div>
+  <dl class="formulas">
+    <dt><span class="chip c-tbw">TBW</span> Total body weight</dt><dd>Measured weight in kg. 1 lb = 0.45359237 kg.</dd>
+    <dt><span class="chip c-ibw">IBW</span> Ideal body weight</dt><dd>Male: 50 + 2.3 × (height in inches − 60)<br>Female: 45.5 + 2.3 × (height in inches − 60)</dd>
+    <dt><span class="chip c-ibw">PBW</span> Predicted body weight</dt><dd>Male: 50 + 0.91 × (height in cm − 152.4)<br>Female: 45.5 + 0.91 × (height in cm − 152.4)<br><span class="muted">Used for tidal volume. The rounded inch and centimeter coefficients give slightly different results; IBW and PBW are calculated separately here.</span></dd>
+    <dt><span class="chip c-lbw">LBW</span> Lean body weight · Janmahasatian</dt><dd>Male: 9270 × TBW ÷ (6680 + 216 × BMI)<br>Female: 9270 × TBW ÷ (8780 + 244 × BMI)</dd>
+    <dt><span class="chip c-adj">AdjBW</span> Adjusted body weight</dt><dd>IBW + 0.4 × (TBW − IBW)</dd>
+    <dt><span class="chip c-none">BMI</span> Body mass index</dt><dd>TBW ÷ height in meters². 1 inch = 2.54 cm.</dd>
+  </dl>
+  <p class="muted">TCI models have model-specific weight and BMI limits. Check the selected pump model and its instructions; do not substitute a calculated weight unless that model explicitly requires it.</p>
+</section>
+<section aria-labelledby="install-heading">
+  <h2 id="install-heading">Use without an internet connection</h2>
+  <ol class="install-steps"><li>Open this page in Safari. Tap Share → Add to Home Screen. Keep Open as Web App enabled if shown.</li><li>Open the new <strong>Anesthesia Dosing</strong> icon while online. Wait for <strong>Ready for offline use</strong>.</li><li>Turn on airplane mode and reopen the icon to confirm offline access.</li></ol>
+  <p class="muted">The calculator, reference tables, formulas, and patient records work offline. Source links and the personal homepage need a connection. Updates require a connection; clearing website data or system storage eviction can remove offline files and records.</p>
+</section>
+<section class="sources" aria-labelledby="sources-heading">
+  <h2 id="sources-heading">Sources</h2>
+  <p class="muted">Original obesity dosing reference adapted for this site. Source links open online.</p>
+  <ol>
+    <li><a href="https://doi.org/10.1111/anae.13101">AAGBI/SOBA. Peri-operative management of the obese surgical patient. Anaesthesia, 2015.</a></li>
+    <li><a href="https://pubmed.ncbi.nlm.nih.gov/21148651/">Ingrande &amp; Lemmens. Dose adjustment of anaesthetics in the morbidly obese. BJA, 2010.</a></li>
+    <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7913453/">Horrow et al. Actual versus ideal body weight dosing of sugammadex. BMC Anesthesiology, 2021.</a></li>
+    <li><a href="https://doi.org/10.1213/ane.0b013e3181b0826a">Meyhoff et al. Should dosing of rocuronium in obese patients be based on ideal or corrected body weight? Anesthesia &amp; Analgesia, 2009.</a></li>
+    <li><a href="https://pubmed.ncbi.nlm.nih.gov/16428539/">Lemmens &amp; Brodsky. The dose of succinylcholine in morbid obesity. Anesthesia &amp; Analgesia, 2006.</a></li>
+    <li><a href="https://www.merck.com/product/usa/pi_circulars/b/bridion/bridion_pi.pdf">BRIDION (sugammadex): U.S. prescribing information.</a></li>
+    <li><a href="https://cdn.clinicaltrials.gov/large-docs/46/NCT01667146/Prot_SAP_000.pdf">PHARLAP study protocol: predicted body weight calculation.</a></li>
+  </ol>
+</section>
+</main>
+<footer><a href="/#tools">← Back to Dawei Sun</a><span>Adults with obesity · Initial doses only</span></footer>
+</div>
+<noscript><p class="no-script">Enable JavaScript to calculate doses and prepare offline use. The reference tables remain available below.</p></noscript>
+</body>
+</html>

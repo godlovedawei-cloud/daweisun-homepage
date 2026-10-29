@@ -240,4 +240,20 @@ p { margin-bottom: 13px; }
 
 /* Distinguish lead and corresponding authorship at a glance. */
 .authorship { color: #bf391b; background: #fff0e8; padding: 1px 6px; border-radius: 3px; font-weight: 750; }
+
+/* Clinical tools share the academic site's restrained typography. */
+.tools-list { margin: 0; padding-left: 24px; }
+.tools-list > li::marker { color: var(--accent); }
+.tool-entry { display: flex; align-items: center; gap: 24px; padding-left: 8px; }
+.tool-entry > div { flex: 1; }
+.tool-entry h3 { font-size: 19px; }
+.tool-entry h3 a { display: inline-block; padding-block: 7px; }
+.tool-entry p { color: var(--muted); margin: 7px 0; }
+.tool-entry .tool-capabilities { color: var(--accent); font-size: 12px; }
+.tool-entry > .button { min-height: 44px; display: inline-flex; align-items: center; white-space: nowrap; }
+@media (max-width: 600px) {
+  .tool-entry { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .tool-entry h3 { font-size: 18px; }
+  .tool-entry p { font-size: 14px; }
+}
 .hero-role { margin-bottom: 17px; }

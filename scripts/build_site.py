@@ -1,6 +1,6 @@
 """Rebuild static pages and the public CV from reviewed content. No network calls."""
 from pathlib import Path
-import json, re, html, hashlib
+import json, re, html, hashlib, runpy, sys
 from xml.sax.saxutils import escape as xml_escape
 ROOT = Path(__file__).resolve().parents[1]
 PUBS = json.loads((ROOT / 'data/publications.json').read_text())
@@ -150,6 +150,7 @@ def header(publications=False):
     links += f'<a href="{("/publications.html" if publications else "#publications")}"' + (' aria-current="page"' if publications else '') + '>Publications</a>'
     links += f'<a href="{home}#grants">Grants &amp; Presentations</a>'
     links += f'<a href="{CV}">CV <span aria-hidden="true">↓</span></a>'
+    links += f'<a href="{home}#tools">Tools</a>'
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="site-header"><div class="wrap header-inner">
 <a class="brand" href="/">Dawei Sun<span class="brand-degree">, M.D., Ph.D.</span></a>
@@ -267,6 +268,12 @@ contributions = f'''<dl class="academic-list">
 home = head('Dawei Sun, M.D., Ph.D. | Anesthesiologist & Researcher', 'Education, clinical experience, research, publications, and curriculum vitae of Dawei Sun, M.D., Ph.D.') + hero
 home += section('training', 'Education &amp; Experience', timeline)
 home += section('clinical', 'Clinical Experience', clinical)
+home += section('tools', 'Tools', '''<ol class="tools-list">
+<li><article class="tool-entry"><div><h3><a href="/tools/anesthesia-dosing/">Anesthesia Dose Quick Reference <span aria-hidden="true">↗</span></a></h3>
+<p>Dosing weights, initial doses, and a drug weight reference for adults with obesity. Designed for quick use on your phone.</p>
+<p class="tool-capabilities">Mobile friendly · Works offline · Add to Home Screen</p></div>
+<a class="button" href="/tools/anesthesia-dosing/">Open tool <span aria-hidden="true">→</span></a></article></li>
+</ol>''')
 home += section('research', 'Research', research)
 home += section('grants', 'Grants &amp; Presentations', grants)
 home += section('innovation', 'Innovation', patent)
@@ -383,5 +390,7 @@ def build_cv():
  doc=SimpleDocTemplate(str(ROOT/'assets/Dawei-Sun-CV.pdf'),pagesize=A4,rightMargin=44,leftMargin=44,topMargin=42,bottomMargin=54,title='Dawei Sun, M.D., Ph.D. - Curriculum Vitae',author='Dawei Sun')
  doc.build(story,onFirstPage=page,onLaterPages=page)
 if __name__=='__main__':
- build_cv()
- print('Built index.html, publications.html, assets/Dawei-Sun-CV.pdf')
+ runpy.run_path(str(ROOT / 'scripts/build_anesthesia_tool.py'), run_name='__main__')
+ if '--pages-only' not in sys.argv:
+  build_cv()
+ print('Built index.html, publications.html, and anesthesia tool' + ('' if '--pages-only' in sys.argv else ', assets/Dawei-Sun-CV.pdf'))

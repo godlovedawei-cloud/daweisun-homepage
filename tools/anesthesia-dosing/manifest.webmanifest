@@ -1,0 +1,16 @@
+{
+  "id": "/tools/anesthesia-dosing/",
+  "name": "Anesthesia Dose Quick Reference",
+  "short_name": "Anesthesia Dosing",
+  "start_url": "/tools/anesthesia-dosing/",
+  "scope": "/tools/anesthesia-dosing/",
+  "display": "standalone",
+  "background_color": "#fcfbf8",
+  "theme_color": "#172c3d",
+  "lang": "en",
+  "description": "Offline dosing weights and initial anesthesia doses for adults with obesity.",
+  "icons": [
+    {"src": "./icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "./icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
