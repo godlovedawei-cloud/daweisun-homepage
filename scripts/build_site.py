@@ -230,7 +230,7 @@ clinical = '''<ul class="clinical-list">
 </figure>
 <figure class="clinical-photo">
 <img src="/assets/clinical/preoperative-clinic.jpg" width="1400" height="1050" loading="lazy" decoding="async" alt="Dawei Sun working in the preoperative anesthesia clinic.">
-<figcaption><strong>Preoperative anesthesia clinic</strong><span>Clinical work at the Second Affiliated Hospital, Zhejiang University School of Medicine.</span></figcaption>
+<figcaption><strong>Preoperative anesthesia clinic</strong><span>Helped develop multidisciplinary workflows for the preoperative anesthesia clinic and optimize pre-anesthetic assessment for day-surgery patients.</span></figcaption>
 </figure>
 </div>'''
 if SHOW_CLINICAL_VOLUMES:
