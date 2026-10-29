@@ -242,19 +242,19 @@ p { margin-bottom: 13px; }
 /* Distinguish lead and corresponding authorship at a glance. */
 .authorship { color: #bf391b; background: #fff0e8; padding: 1px 6px; border-radius: 3px; font-weight: 750; }
 
-/* Clinical tools share the academic site's restrained typography. */
-.tools-list { margin: 0; padding-left: 24px; }
-.tools-list > li::marker { color: var(--accent); }
-.tool-entry { display: flex; align-items: center; gap: 24px; padding-left: 8px; }
-.tool-entry > div { flex: 1; }
-.tool-entry h3 { font-size: 19px; }
-.tool-entry h3 a { display: inline-block; padding-block: 7px; }
-.tool-entry p { color: var(--muted); margin: 7px 0; }
-.tool-entry .tool-capabilities { color: var(--accent); font-size: 12px; }
-.tool-entry > .button { min-height: 44px; display: inline-flex; align-items: center; white-space: nowrap; }
+/* Native disclosure keeps tool links available without JavaScript. */
+.tools-menu { position: relative; }
+.tools-menu summary { display: flex; align-items: center; gap: 5px; min-height: 44px; color: var(--muted); font-size: 11px; cursor: pointer; list-style: none; }
+.tools-menu summary::-webkit-details-marker { display: none; }
+.tools-menu summary::marker { content: ''; }
+.tools-menu summary:hover, .tools-menu[open] summary { color: var(--accent); }
+.tools-menu summary:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.tools-dropdown { position: absolute; top: 100%; right: 0; z-index: 6; width: 282px; max-width: calc(100vw - 40px); background: var(--paper); border: 1px solid var(--line); border-radius: 5px; padding: 6px; box-shadow: 0 8px 24px #172c3d14; }
+.nav .tools-dropdown a { display: flex; min-height: 44px; padding: 10px 12px; font-size: 13px; white-space: normal; overflow-wrap: anywhere; }
+.nav .tools-dropdown a:hover { background: #edf3ef; }
 @media (max-width: 600px) {
-  .tool-entry { flex-direction: column; align-items: flex-start; gap: 12px; }
-  .tool-entry h3 { font-size: 18px; }
-  .tool-entry p { font-size: 14px; }
+  .nav { position: relative; }
+  .tools-menu { position: static; }
+  .tools-dropdown { top: 100%; right: 0; }
 }
 .hero-role { margin-bottom: 17px; }

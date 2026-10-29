@@ -79,7 +79,6 @@ td:last-child { min-width:180px; }
 .formulas dt { font-weight:600; margin-top:18px; }
 .formulas dt:first-child { margin-top:0; }
 .formulas dd { margin:8px 0 0; overflow-wrap:anywhere; }
-.formulas dd .muted { display:block; margin-top:8px; font-size:14px; }
 ol { margin:0; padding-left:22px; }
 li { padding-left:3px; margin-bottom:12px; }
 .sources a { display:inline-block; min-height:44px; overflow-wrap:anywhere; }

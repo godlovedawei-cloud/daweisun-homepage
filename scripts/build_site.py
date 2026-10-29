@@ -24,6 +24,12 @@ RESIDENCY_DETAIL = ('Standardized Residency Training (national program), three y
 ANESTHESIOLOGIST_DETAIL = ('Surgical anesthesia, research, participation in establishing the preoperative anesthesia clinic, '
                           'and management of the preoperative preparation area for arterial line placement, '
                           'central venous catheterization, and peripheral nerve blocks.')
+# Web-only wording; retain the existing public PDF's reviewed content.
+WEB_ANESTHESIOLOGIST_DETAIL = 'Surgical anesthesia, research, and participation in establishing the preoperative anesthesia clinic.'
+WEB_POSTDOC_DETAIL = ('China’s clinical postdoctoral program integrates research with standardized residency training. '
+                     'During this fellowship, I led the implementation of a study of intraoperative oxygen supply–demand balance '
+                     'in cardiac and major vascular surgery. The study enrolled 1,560 cardiac surgery patients, '
+                     'with 314 included in the final analysis.')
 UCSF_RESEARCH = 'Research on neonatal hypoxic-ischemic encephalopathy. Research mentor: Donna M. Ferriero.'
 PHD_RESEARCH = 'Research on cerebral ischemia.'
 # Fill only from the confirmed Torrance observation log; None means not yet entered.
@@ -53,7 +59,7 @@ PRESENTATIONS = [
 
 
 BIOGRAPHY_PARAGRAPHS = [
-    'I am an anesthesiologist and physician-scientist. I completed anesthesiology residency at the Second Affiliated Hospital of Zhejiang University School of Medicine, managing more than 1,500 cases across cardiac, neurosurgical, obstetric, and pediatric anesthesia, and then practiced there as an anesthesiologist, where I helped build the hospital’s preoperative anesthesia clinic.',
+    'I am an anesthesiologist and researcher. I completed anesthesiology residency at the Second Affiliated Hospital of Zhejiang University School of Medicine, managing more than 1,500 cases across cardiac, neurosurgical, obstetric, and pediatric anesthesia, and then practiced there as an anesthesiologist, where I helped build the hospital’s preoperative anesthesia clinic.',
     'In the laboratory, I study how to protect the brain when its blood and oxygen supply is interrupted, as in cardiac arrest or oxygen deprivation at birth. I began this work during my Ph.D. at Shanghai Jiao Tong University, extended it to the newborn brain with Donna Ferriero at UCSF, and now lead it as principal investigator on a National Natural Science Foundation of China grant.',
     'My clinical research addresses practical questions in everyday anesthesia care. I led a randomized, double-blind trial in 344 patients showing that ciprofol, a newer alternative to propofol with less hypotension and injection pain, can be used alone for upper endoscopy sedation, without an added opioid, as effectively as ciprofol plus fentanyl, while keeping breathing and blood pressure steadier. I also led a prospective study in cardiac surgery testing whether the difference between arterial and venous oxygen levels can tell clinicians when a blood transfusion is truly needed. That work was selected for oral presentation at the 2024 ASA Annual Meeting and led me to design a probe for continuous venous oxygen monitoring.',
     'I have also helped develop large population studies using the UK Biobank, each including more than 160,000 participants, on how lifestyle and cardiovascular health shape heart disease and disease-free life expectancy.',
@@ -114,7 +120,7 @@ def version_assets(markup):
         asset_path = match.group(2)
         digest = hashlib.sha256((ROOT / asset_path.lstrip('/')).read_bytes()).hexdigest()[:10]
         return f'{match.group(1)}="{asset_path}?v={digest}"'
-    return re.sub(r'(src|href)="(/assets/[^"?]+\.(?:css|jpg|png|webp|svg))"', with_version, markup)
+    return re.sub(r'(src|href)="(/assets/[^"?]+\.(?:css|js|jpg|png|webp|svg))"', with_version, markup)
 
 
 def head(title, description, path='/'):
@@ -140,6 +146,7 @@ def head(title, description, path='/'):
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://daweisun.com/assets/portrait.jpg">
 <link rel="stylesheet" href="/assets/site.css">
+<script src="/assets/navigation.js" defer></script>
 </head>'''
 
 
@@ -149,8 +156,8 @@ def header(publications=False):
         ('training', 'Experience'), ('clinical', 'Clinical'), ('research', 'Research')])
     links += f'<a href="{("/publications.html" if publications else "#publications")}"' + (' aria-current="page"' if publications else '') + '>Publications</a>'
     links += f'<a href="{home}#grants">Grants &amp; Presentations</a>'
-    links += f'<a href="{CV}">CV <span aria-hidden="true">↓</span></a>'
-    links += f'<a href="{home}#tools">Tools</a>'
+    links += '''<details class="tools-menu"><summary>Tools <span aria-hidden="true">▾</span></summary>
+<div class="tools-dropdown"><a href="/tools/anesthesia-dosing/">Anesthesia Dose Quick Reference</a></div></details>'''
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="site-header"><div class="wrap header-inner">
 <a class="brand" href="/">Dawei Sun<span class="brand-degree">, M.D., Ph.D.</span></a>
@@ -181,6 +188,9 @@ def timeline_entry(date, title, institution, detail=''):
 
 portrait = next((ROOT / 'assets' / name for name in ['portrait.jpg', 'portrait.png', 'portrait.webp'] if (ROOT / 'assets' / name).exists()), None)
 portrait_html = f'<figure class="hero-portrait"><img src="/assets/{portrait.name}" alt="Dawei Sun" width="783" height="1000" fetchpriority="high"></figure>' if portrait else ''
+biography_html = [E(paragraph) for paragraph in BIOGRAPHY_PARAGRAPHS]
+hospital_mention = 'Second Affiliated Hospital of Zhejiang University School of Medicine'
+biography_html[0] = biography_html[0].replace(hospital_mention, f'<a href="https://en.z2hospital.com/">{hospital_mention}</a>', 1)
 hero = f'''<body>{header()}
 <main id="main" tabindex="-1">
 <section class="hero"><div class="wrap hero-layout{' with-portrait' if portrait else ''}">
@@ -191,14 +201,14 @@ hero = f'''<body>{header()}
 <div class="buttons"><a class="button" href="{CV}">Download CV <span aria-hidden="true">↓</span></a></div>
 {profiles()}
 </div>{portrait_html}
-<div class="bio">{''.join(f'<p>{E(paragraph)}</p>' for paragraph in BIOGRAPHY_PARAGRAPHS)}</div>
+<div class="bio">{''.join(f'<p>{paragraph}</p>' for paragraph in biography_html)}</div>
 </div></section>'''
 timeline = '<ol class="career-timeline">'
 timeline += timeline_entry('November 2026', 'Clinical Observer', 'University of Utah Hospital<br>Department of Anesthesiology, Perioperative &amp; Pain Medicine', 'Four-week clinical observership.')
-timeline += timeline_entry('October 2026', 'Clinical Observer', 'Torrance Memorial Hospital<br>Department of Anesthesiology · Torrance, California', 'Four-week clinical observership.' + torrance_counts())
+timeline += timeline_entry('October 2026', 'Clinical Observer', 'Torrance Memorial Hospital<br>Department of Anesthesiology', 'Four-week clinical observership.' + torrance_counts())
 timeline += timeline_entry('November 2024 – Present', 'Associate Researcher', INSTITUTION, 'Cerebral ischemia and neuroprotection, with a focus on autophagy and mitophagy.')
-timeline += timeline_entry('September 2023 – October 2024', 'Anesthesiologist', HOSPITAL, E(ANESTHESIOLOGIST_DETAIL))
-timeline += timeline_entry('September 2020 – February 2024', 'Clinical Postdoctoral Fellow', 'Zhejiang University', E(POSTDOC_RESEARCH) + '<br><br>' + E(POSTDOC_NOTE))
+timeline += timeline_entry('September 2023 – October 2024', 'Anesthesiologist', HOSPITAL, E(WEB_ANESTHESIOLOGIST_DETAIL))
+timeline += timeline_entry('September 2020 – February 2024', 'Clinical Postdoctoral Fellow', 'Zhejiang University', E(WEB_POSTDOC_DETAIL))
 timeline += timeline_entry('September 2020 – August 2023', 'Residency in Anesthesiology', HOSPITAL, E(RESIDENCY_DETAIL))
 timeline += timeline_entry('October 2018 – October 2019', 'Visiting Scholar', 'University of California San Francisco', 'Neurology &amp; Pediatrics · ' + E(UCSF_RESEARCH))
 timeline += timeline_entry('September 2015 – June 2020', 'Ph.D. in Anesthesiology', 'Shanghai Jiao Tong University', E(PHD_RESEARCH))
@@ -268,12 +278,6 @@ contributions = f'''<dl class="academic-list">
 home = head('Dawei Sun, M.D., Ph.D. | Anesthesiologist & Researcher', 'Education, clinical experience, research, publications, and curriculum vitae of Dawei Sun, M.D., Ph.D.') + hero
 home += section('training', 'Education &amp; Experience', timeline)
 home += section('clinical', 'Clinical Experience', clinical)
-home += section('tools', 'Tools', '''<ol class="tools-list">
-<li><article class="tool-entry"><div><h3><a href="/tools/anesthesia-dosing/">Anesthesia Dose Quick Reference <span aria-hidden="true">↗</span></a></h3>
-<p>Dosing weights, initial doses, and a drug weight reference for adults with obesity. Designed for quick use on your phone.</p>
-<p class="tool-capabilities">Mobile friendly · Works offline · Add to Home Screen</p></div>
-<a class="button" href="/tools/anesthesia-dosing/">Open tool <span aria-hidden="true">→</span></a></article></li>
-</ol>''')
 home += section('research', 'Research', research)
 home += section('grants', 'Grants &amp; Presentations', grants)
 home += section('innovation', 'Innovation', patent)
