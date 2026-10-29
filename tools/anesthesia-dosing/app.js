@@ -1,4 +1,4 @@
-import { calculate, doseRows, KG_PER_LB } from './calculator.mjs';
+import { calculate, doseRows, KG_PER_LB, CHOICES, normalizeChoices } from './calculator.mjs';
 
 const $ = id => document.getElementById(id);
 const KEY = 'daweisun.anesthesia-dosing.patients.v1';
@@ -9,7 +9,7 @@ let inputError = '';
 
 function storageWarning() {
   storageOK = false;
-  $('storage-status').textContent = 'Storage unavailable. Records last only while this page stays open.';
+  $('storage-status').textContent = 'Storage unavailable · session only';
 }
 function readRecords() {
   try {
@@ -23,7 +23,7 @@ function readRecords() {
       seen.add(p.id);
       return true;
     }).map(p => ({ id: p.id, label: typeof p.label === 'string' ? p.label.slice(0, 24) : '', sex: p.sex,
-      cm: p.cm, kg: p.kg, created: p.created, used: p.used })).sort((a, b) => b.used - a.used).slice(0, 100);
+      cm: p.cm, kg: p.kg, choices: normalizeChoices(p.choices), created: p.created, used: p.used })).sort((a, b) => b.used - a.used).slice(0, 100);
   } catch {
     storageWarning();
     return [];
@@ -39,7 +39,7 @@ function sorted() { return patients.slice().sort((a, b) => b.used - a.used); }
 function dateLabel(t) { return new Date(t).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
 function makePatient() {
   const now = Date.now();
-  return { id: crypto.randomUUID(), label: '', sex: 'm', cm: null, kg: null, created: now, used: now };
+  return { id: crypto.randomUUID(), label: '', sex: 'm', cm: null, kg: null, choices: normalizeChoices(), created: now, used: now };
 }
 function renderBar() {
   const list = sorted();
@@ -58,7 +58,7 @@ function renderBar() {
     return button;
   });
   if (!nodes.length) {
-    const empty = document.createElement('p'); empty.className = 'empty'; empty.textContent = 'No archived records. Your 5 most recent records appear above.'; nodes.push(empty);
+    const empty = document.createElement('p'); empty.className = 'empty'; empty.textContent = 'No archived records.'; nodes.push(empty);
   }
   $('archive').replaceChildren(...nodes);
 }
@@ -79,7 +79,7 @@ function weightFields(except = '') {
   if (except !== 'lb') $('lb').value = current.kg === null ? '' : numberText(current.kg / KG_PER_LB);
 }
 function openPatient(patient) {
-  current = patient; current.used = Math.max(Date.now(), ...patients.map(p => p.used + 1));
+  current = patient; current.choices = normalizeChoices(current.choices); current.used = Math.max(Date.now(), ...patients.map(p => p.used + 1));
   inputError = '';
   $('patient-label').value = current.label;
   $('sex').value = current.sex;
@@ -105,13 +105,13 @@ function sync(id) {
       value = parsed(id);
       if (value !== null && id === 'total-inches') value *= 2.54;
     }
-    if (value !== null && (!Number.isFinite(value) || value <= 0)) inputError = 'Enter a positive height. Feet must be whole numbers and inches must be below 12.';
+    if (value !== null && (!Number.isFinite(value) || value <= 0)) inputError = 'Check height · whole feet, inches <12.';
     current.cm = value !== null && Number.isFinite(value) && value > 0 ? value : null;
     heightFields(id);
   } else {
     let value = parsed(id);
     if (value !== null && id === 'lb') value *= KG_PER_LB;
-    if (value !== null && (!Number.isFinite(value) || value <= 0)) inputError = 'Enter a positive, finite weight.';
+    if (value !== null && (!Number.isFinite(value) || value <= 0)) inputError = 'Enter a positive weight.';
     current.kg = value !== null && Number.isFinite(value) && value > 0 ? value : null;
     weightFields(id);
   }
@@ -120,23 +120,40 @@ function sync(id) {
 }
 function render() {
   const result = calculate(current.sex, current.cm, current.kg);
-  const invalid = inputError || (current.cm && current.kg && !result ? 'Check height and weight. The formulas must produce positive, finite weights.' : '');
-  $('input-message').textContent = invalid || (result ? `${numberText(current.cm)} cm · ${numberText(current.kg)} kg${result.bmi < 30 ? ' · BMI below 30: obesity dosing guidance may not apply.' : ''}` : 'Enter height and weight to calculate.');
+  const invalid = inputError || (current.cm && current.kg && !result ? 'Check height and weight.' : '');
+  const message = invalid || (current.cm && current.cm < 152.4 ? 'Height <152.4 cm: check weight formulas.' : '');
+  $('input-message').textContent = message;
+  $('input-message').hidden = !message;
   $('input-message').classList.toggle('error', Boolean(invalid));
   for (const id of ['tbw', 'ibw', 'pbw', 'lbw', 'adj', 'bmi']) $(id).textContent = result && !invalid ? result[id].toFixed(1) + (id === 'bmi' ? '' : ' kg') : '—';
   if (!result || invalid) {
-    const message = document.createElement('p'); message.className = 'muted'; message.textContent = 'Results appear after valid height and weight are entered.';
-    $('doses').replaceChildren(message); return;
+    $('doses').replaceChildren(); return;
   }
-  $('doses').replaceChildren(...doseRows(result).map(row => {
+  $('doses').replaceChildren(...doseRows(result, current.choices).map(row => {
     const div = document.createElement('div'); div.className = 'dose-row';
     const label = document.createElement('div'); label.className = 'dose-label';
     const name = document.createElement('span'); name.className = 'dose-name'; name.textContent = row.name;
     const chip = document.createElement('span'); chip.className = `chip c-${row.kind}`; chip.textContent = row.scalar;
-    label.append(name, chip);
+    label.append(name);
+    if (row.scalar) label.append(chip);
     const value = document.createElement('output'); value.className = 'dose-value'; value.textContent = row.value;
     const note = document.createElement('span'); note.className = 'dose-note'; note.textContent = row.note;
-    div.append(label, value, note); return div;
+    div.append(label);
+    if (row.choice) {
+      const select = document.createElement('select');
+      select.id = 'choice-' + row.choice; select.className = 'dose-choice';
+      select.setAttribute('aria-label', row.name + (row.choice === 'propofol' || row.choice === 'fentanyl' ? ' context' : ' dosing weight'));
+      select.append(new Option(row.choice === 'propofol' || row.choice === 'fentanyl' ? 'Select context' : 'Select dosing weight', ''));
+      CHOICES[row.choice].forEach(option => select.append(new Option(option.label, option.value)));
+      select.value = current.choices[row.choice];
+      select.addEventListener('change', () => {
+        current.choices[row.choice] = select.value; save(); render(); $('choice-' + row.choice).focus();
+      });
+      div.append(select);
+    }
+    div.append(value);
+    if (row.note) div.append(note);
+    return div;
   }));
 }
 fields.forEach(id => $(id).addEventListener('input', () => sync(id)));
@@ -157,9 +174,11 @@ openPatient(sorted()[0]);
 let registration;
 let ready = false;
 let refreshing = false;
-function offlineStatus(text, error = false) {
-  $('offline-status').textContent = text;
-  $('offline-status').parentElement.classList.toggle('error', error);
+function showOfflineActions() {
+  $('offline-controls').hidden = $('update-app').hidden && $('retry-offline').hidden;
+}
+function offerRetry() {
+  $('retry-offline').hidden = false; showOfflineActions();
 }
 function workerMessage(worker, type) {
   return new Promise((resolve, reject) => {
@@ -174,11 +193,10 @@ async function checkOffline() {
   if (!worker) return;
   try {
     const status = await workerMessage(worker, 'STATUS'); ready = status.ready === true;
-    offlineStatus(ready ? (navigator.onLine ? 'Ready for offline use' : 'Offline · Ready for offline use') : 'Offline files incomplete. Connect and retry download.', !ready);
-    $('retry-offline').hidden = ready;
-  } catch { offlineStatus('Could not verify offline files. Connect and retry download.', true); $('retry-offline').hidden = false; }
+    $('retry-offline').hidden = ready; showOfflineActions();
+  } catch { offerRetry(); }
 }
-function showUpdate() { $('update-app').hidden = !registration?.waiting; }
+function showUpdate() { $('update-app').hidden = !registration?.waiting; showOfflineActions(); }
 function watchRegistration(reg) {
   registration = reg; showUpdate();
   const watch = () => {
@@ -190,15 +208,14 @@ function watchRegistration(reg) {
         else checkOffline();
       }
       if (worker.state === 'redundant') {
-        offlineStatus(ready ? 'Ready for offline use · Update download failed; keeping current version.' : 'Offline download failed. Connect and retry download.', !ready);
-        $('retry-offline').hidden = false;
+        offerRetry();
       }
     });
   };
   reg.addEventListener('updatefound', watch); watch();
 }
 async function prepareOffline() {
-  if (!('serviceWorker' in navigator) || !window.isSecureContext) { offlineStatus('Offline installation needs Safari over HTTPS.', true); return; }
+  if (!('serviceWorker' in navigator) || !window.isSecureContext) { return; }
   try {
     const existing = await navigator.serviceWorker.getRegistration('./');
     if (existing) { watchRegistration(existing); await checkOffline(); }
@@ -208,17 +225,21 @@ async function prepareOffline() {
     if (navigator.storage?.persist) navigator.storage.persist().catch(() => {});
   } catch {
     if (registration?.active) await checkOffline();
-    else { offlineStatus('Offline download unavailable. Connect and retry download.', true); $('retry-offline').hidden = false; }
+    else offerRetry();
   }
 }
 $('retry-offline').addEventListener('click', async () => {
-  $('retry-offline').hidden = true; offlineStatus('Downloading offline files…');
+  $('retry-offline').hidden = true; showOfflineActions();
   try {
     if (!registration?.active) { await prepareOffline(); return; }
-    const result = await workerMessage(registration.active, 'REPAIR');
-    if (!result.ready) throw new Error('Incomplete cache');
-    await checkOffline(); await registration.update();
-  } catch { await checkOffline(); if (!ready) $('retry-offline').hidden = false; }
+    await checkOffline();
+    if (!ready) {
+      const result = await workerMessage(registration.active, 'REPAIR');
+      if (!result.ready) throw new Error('Incomplete cache');
+      await checkOffline();
+    }
+    await registration.update();
+  } catch { offerRetry(); }
 });
 $('update-app').addEventListener('click', () => {
   if (!registration?.waiting) return;
