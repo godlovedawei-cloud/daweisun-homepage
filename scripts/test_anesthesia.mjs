@@ -7,8 +7,11 @@ near(male.lbw, 78.95528617727304); near(male.adj, 98.3084); near(male.bmi, 43.05
 const rows = doseRows(male);
 assert.equal(rows.length, 8);
 assert.deepEqual(rows[1].variants.map(r => r.value), ['158–197 mg', '79–118 mg', '39–118 mg', '79–158 mg']);
-assert.deepEqual(rows[2].variants.map(r => r.value), ['158 μg', '158–1579 μg', '1579–3948 μg']);
-assert.match(rows[2].name, /total dose/);
+assert.deepEqual(rows[2].variants.map(r => r.value), ['39–79 μg', '79–237 μg', '25–50 μg', '39–158 μg', '79–158 μg/h', '25–50 μg', '790–1974 μg']);
+assert.equal(rows[2].name, 'Fentanyl'); assert.match(rows[2].note, /Clinical practice, not label/);
+assert.match(rows[2].variants[4].coefficient, /postop ventilation planned/);
+assert.match(rows[2].variants[6].coefficient, /selected cardiac; postop ventilation planned/);
+assert.match(rows[2].variants[3].coefficient, /total/);
 assert.equal(rows[3].scalar, 'TBW'); assert.equal(rows[3].value, '82 mg');
 assert.equal(rows[4].scalar, 'TBW'); assert.equal(rows[4].value, '163 mg');
 assert.match(rows[3].note, /US label/); assert.match(rows[4].note, /US label/);
@@ -43,4 +46,10 @@ for (const bad of [null, undefined, NaN, Infinity, -Infinity, 0, -1]) {
   assert.equal(calculate('m', bad, 100), null); assert.equal(calculate('f', 165, bad), null);
 }
 assert.equal(calculate('x', 177.8, 100), null); assert.equal(calculate('f', 1, 100), null);
-console.log('PASS: both sexes, all 7 context results without selection, fixed rocuronium TBW, ignored legacy choices, weight formulas, short heights, units, 120 kg threshold.');
+
+for (const weight of [50, 100, 200]) {
+  const fent = doseRows(calculate('m', 177.8, weight))[2].variants;
+  assert.equal(fent[2].value, '25–50 μg'); assert.equal(fent[5].value, '25–50 μg');
+  assert.match(fent[4].value, /μg\/h$/);
+}
+console.log('PASS: both sexes, all Propofol and 7 clinical-practice Fentanyl uses without selection, fixed rocuronium TBW, ignored legacy choices, weight formulas, short heights, units, 120 kg threshold.');
