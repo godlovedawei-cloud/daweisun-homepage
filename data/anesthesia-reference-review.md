@@ -43,3 +43,11 @@ Source check: the [Zhejiang University First Affiliated Hospital label page](htt
 At the owner's request, both displayed and executed IBW/PBW now use male 50 + 2.3 × (height in inches − 60) kg and female 45.5 + 2.3 × (height in inches − 60) kg. The [NIH ARDS Network SAILS protocol](https://biolincc.nhlbi.nih.gov/media/studies/sails/Protocol.pdf) lists both PBW equations; the [NIH LaSRS protocol](https://biolincc.nhlbi.nih.gov/media/studies/lasrs/Protocol.pdf) lists the same adult IBW equations. Height stored in cm is divided by exact 2.54; no rounding occurs before calculation. Replacing rounded 0.91/cm with 2.3/in makes a small numerical difference, rather than being an exactly equivalent unit substitution. At 70 inches, male IBW/PBW is 73 kg and female is 68.5 kg. Saved-case inputs are preserved and recalculated with the current formula.
 
 The BMI formula row is removed only from Formulas. BMI output and Janmahasatian LBW calculation remain unchanged; AdjBW retains its 0.4 coefficient. The short-height check remains at 152.4 cm (60 inches) with an inch-based prompt.
+
+
+## Hydromorphone and remifentanil reference additions
+
+- [Hydromorphone hydrochloride injection, section 2.2](https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=31d5a37a-0e90-4e88-be14-75c877be9de2): initial IV dose 0.2–1 mg every 2–3 hours, administered slowly over at least 2–3 minutes. This is a fixed adult IV dose, so the reference weight cell is “Fixed · titrate”, replacing the prior generic IBW/AdjBW suggestion. It is not multiplied by body weight and is not an IM/SC regimen.
+- [ULTIVA, section 2.2, adult Table 1](https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=8b4c8696-e23e-4c51-a4d2-babab5bd945a): general-anesthesia maintenance with propofol or isoflurane lists a continuous IV infusion range of 0.05–2 μg/kg/min. The page retains these concomitant-agent conditions; this is not a MAC or bolus range. The existing LBW weight chip is separately identified as obesity literature, not as the label's mandated weight scalar.
+
+These edits add reference text only; the eight automatic calculation groups and local case format are unchanged.
