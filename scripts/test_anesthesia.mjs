@@ -1,35 +1,29 @@
 import assert from 'node:assert/strict';
 import { calculate, doseRows, dosingWeight, normalizeChoices, KG_PER_LB } from '../tools/anesthesia-dosing/calculator.mjs';
 const near = (value, expected) => assert.ok(Math.abs(value - expected) < 1e-9, `${value} != ${expected}`);
-const selected = { propofol: 'adult', fentanyl: 'low', rocuronium: 'tbw', rsi: 'adj' };
 const male = calculate('m', 177.8, 136.1);
 near(male.ibw, 73.114); near(male.pbw, 73.114);
 near(male.lbw, 78.95528617727304); near(male.adj, 98.3084); near(male.bmi, 43.05212692058037);
-assert.deepEqual(doseRows(male, selected).map(r => r.value), [
-  '439–585 mL', '158–197 mg', '158 μg', '82 mg', '118 mg', '136 mg', '272 / 544 / 2178 mg', '3 g',
-]);
-assert.deepEqual(doseRows(male).slice(1, 5).map(r => r.value), ['—', '—', '—', '—']);
+const rows = doseRows(male);
+assert.equal(rows.length, 8);
+assert.deepEqual(rows[1].variants.map(r => r.value), ['158–197 mg', '79–118 mg', '39–118 mg', '79–158 mg']);
+assert.deepEqual(rows[2].variants.map(r => r.value), ['158 μg', '158–1579 μg', '1579–3948 μg']);
+assert.match(rows[2].name, /total dose/);
+assert.equal(rows[3].scalar, 'TBW'); assert.equal(rows[3].value, '82 mg');
+assert.equal(rows[4].scalar, 'TBW'); assert.equal(rows[4].value, '163 mg');
+assert.match(rows[3].note, /US label/); assert.match(rows[4].note, /US label/);
+assert.equal(rows[0].value, '439–585 mL');
+assert.equal(rows[5].value, '136 mg'); assert.equal(rows[6].value, '272 / 544 / 2178 mg');
+assert.equal(rows[7].value, '3 g');
+assert.ok(rows.every(row => !row.choice));
+assert.deepEqual(doseRows(male, { propofol: 'older', fentanyl: 'high', rocuronium: 'ibw', rsi: 'adj' }), rows);
 assert.deepEqual(normalizeChoices(), { propofol: '', fentanyl: '', rocuronium: '', rsi: '' });
 assert.deepEqual(normalizeChoices({ propofol: 'bogus', fentanyl: 10, rocuronium: null, rsi: '__proto__' }), normalizeChoices());
-const propofolCases = { adult: '158–197 mg', older: '79–118 mg', cardiac: '39–118 mg', neuro: '79–158 mg' };
-for (const [propofol, expected] of Object.entries(propofolCases)) assert.equal(doseRows(male, { propofol })[1].value, expected);
-const fentanylCases = { low: '158 μg', moderate: '158–1579 μg', high: '1579–3948 μg' };
-for (const [fentanyl, expected] of Object.entries(fentanylCases)) {
-  const row = doseRows(male, { fentanyl })[2]; assert.equal(row.value, expected); assert.match(row.name, /total dose/); assert.match(row.note, /total/);
-}
-for (const [scalar, routine, rsi] of [
-  ['tbw', '82 mg', '163 mg'], ['ibw', '44 mg', '88 mg'], ['lbw', '47 mg', '95 mg'], ['adj', '59 mg', '118 mg'],
-]) {
-  const rows = doseRows(male, { rocuronium: scalar, rsi: scalar });
-  assert.equal(rows[3].value, routine); assert.equal(rows[4].value, rsi);
-  assert.match(rows[3].note, scalar === 'tbw' ? /US label/ : /obesity literature/);
-  assert.match(rows[4].note, /selected weight/);
-}
 const female = calculate('f', 165.1, 100);
 near(female.ibw, 57.057); near(female.pbw, 57.057); near(female.lbw, 52.27984923739807);
 near(female.adj, 74.2342); near(female.bmi, 36.68646390547219);
 assert.equal(doseRows(female)[0].value, '342–456 mL');
-assert.equal(doseRows(female, selected)[1].value, '105–131 mg');
+assert.equal(doseRows(female)[1].variants[0].value, '105–131 mg');
 const underweight = calculate('m', 180, 50);
 near(underweight.ibw, 75.116); near(underweight.adj, 65.0696);
 assert.equal(dosingWeight(underweight, 'ibw'), 50); assert.equal(dosingWeight(underweight, 'adj'), 50);
@@ -49,4 +43,4 @@ for (const bad of [null, undefined, NaN, Infinity, -Infinity, 0, -1]) {
   assert.equal(calculate('m', bad, 100), null); assert.equal(calculate('f', 165, bad), null);
 }
 assert.equal(calculate('x', 177.8, 100), null); assert.equal(calculate('f', 1, 100), null);
-console.log('PASS: both sexes, shared IBW/PBW, all contexts/scalars, unset/invalid choices, underweight fallback, short heights, severe obesity, units, 120 kg threshold.');
+console.log('PASS: both sexes, all 7 context results without selection, fixed rocuronium TBW, ignored legacy choices, weight formulas, short heights, units, 120 kg threshold.');

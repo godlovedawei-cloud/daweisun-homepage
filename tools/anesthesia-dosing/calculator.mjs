@@ -40,30 +40,23 @@ export function calculate(sex, cm, kg) {
 export function dosingWeight(r, scalar) {
   return r.tbw < r.ibw && ['ibw', 'adj'].includes(scalar) ? r.tbw : r[scalar];
 }
-const scalarName = { tbw: 'TBW', ibw: 'IBW', lbw: 'LBW', adj: 'AdjBW' };
-const scalarKind = { tbw: 'tbw', ibw: 'ibw', lbw: 'lbw', adj: 'adj' };
 const amount = (low, high, weight, unit) => low === high ? `${Math.round(low * weight)} ${unit}` : `${Math.round(low * weight)}–${Math.round(high * weight)} ${unit}`;
-export function doseRows(r, selections = {}) {
-  const choices = normalizeChoices(selections);
-  const prop = CHOICES.propofol.find(x => x.value === choices.propofol);
-  const fent = CHOICES.fentanyl.find(x => x.value === choices.fentanyl);
-  const rocRow = (key, name, multiplier) => {
-    const scalar = choices[key];
-    const fallback = scalar && r.tbw < r.ibw && ['ibw', 'adj'].includes(scalar);
-    return { name, choice: key, scalar: scalar ? scalarName[scalar] + (fallback ? ' → TBW' : '') : '',
-      kind: fallback ? 'tbw' : scalarKind[scalar], value: scalar ? amount(multiplier, multiplier, dosingWeight(r, scalar), 'mg') : '—',
-      note: scalar ? `${multiplier} mg/kg · ${key === 'rsi' ? 'selected weight' : scalar === 'tbw' ? 'US label' : 'obesity literature'}` : '' };
-  };
+// Every context is visible. Old saved selections never affect these results.
+export function doseRows(r) {
+  const variant = (label, low, high, unit) => ({ label,
+    coefficient: `${low === high ? low : `${low}–${high}`} ${unit}/kg`,
+    value: amount(low, high, r.lbw, unit),
+  });
   return [
     { name: 'Tidal volume', scalar: 'PBW', kind: 'ibw', value: amount(6, 8, r.pbw, 'mL'), note: '6–8 mL/kg' },
-    { name: 'Propofol induction', choice: 'propofol', scalar: 'LBW', kind: 'lbw',
-      value: prop ? amount(prop.low, prop.high, r.lbw, 'mg') : '—',
-      note: prop ? `${prop.low}–${prop.high} mg/kg · US label range; LBW: obesity literature` : '' },
-    { name: 'Fentanyl · total dose', choice: 'fentanyl', scalar: 'LBW', kind: 'lbw',
-      value: fent ? amount(fent.low, fent.high, r.lbw, 'μg') : '—',
-      note: fent ? `${fent.low === fent.high ? fent.low : `${fent.low}–${fent.high}`} μg/kg total · US label range; LBW: obesity literature${choices.fentanyl !== 'low' ? ' · Ventilatory support' : ''}` : '' },
-    rocRow('rocuronium', 'Rocuronium', 0.6),
-    rocRow('rsi', 'Rocuronium RSI', 1.2),
+    { name: 'Propofol induction', scalar: 'LBW', kind: 'lbw',
+      variants: [variant('<65 · ASA I–II', 2, 2.5, 'mg'), variant('Elderly / frail / ASA III–IV', 1, 1.5, 'mg'), variant('Cardiac', 0.5, 1.5, 'mg'), variant('Neurosurgical', 1, 2, 'mg')],
+      note: 'US label ranges · LBW: obesity literature' },
+    { name: 'Fentanyl · total dose', scalar: 'LBW', kind: 'lbw',
+      variants: [variant('Low', 2, 2, 'μg'), variant('Moderate', 2, 20, 'μg'), variant('High', 20, 50, 'μg')],
+      note: 'US label total-dose ranges · LBW: obesity literature. Moderate/high: ventilatory support.' },
+    { name: 'Rocuronium', scalar: 'TBW', kind: 'tbw', value: amount(0.6, 0.6, r.tbw, 'mg'), note: '0.6 mg/kg · US label' },
+    { name: 'Rocuronium RSI', scalar: 'TBW', kind: 'tbw', value: amount(1.2, 1.2, r.tbw, 'mg'), note: '1.2 mg/kg · US label rapid-onset dose' },
     { name: 'Succinylcholine', scalar: 'TBW', kind: 'tbw', value: amount(1, 1, r.tbw, 'mg'), note: '1 mg/kg · obesity literature' },
     { name: 'Sugammadex', scalar: 'TBW', kind: 'tbw', value: `${Math.round(r.tbw * 2)} / ${Math.round(r.tbw * 4)} / ${Math.round(r.tbw * 16)} mg`,
       note: '2: T2 · 4: PTC 1–2, TOF 0 · 16: ~3 min after rocuronium 1.2 mg/kg' },

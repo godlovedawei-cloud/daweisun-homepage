@@ -1,4 +1,4 @@
-import { calculate, doseRows, KG_PER_LB, CHOICES, normalizeChoices } from './calculator.mjs';
+import { calculate, doseRows, KG_PER_LB, normalizeChoices } from './calculator.mjs';
 
 const $ = id => document.getElementById(id);
 const KEY = 'daweisun.anesthesia-dosing.patients.v1';
@@ -129,7 +129,7 @@ function render() {
   if (!result || invalid) {
     $('doses').replaceChildren(); return;
   }
-  $('doses').replaceChildren(...doseRows(result, current.choices).map(row => {
+  $('doses').replaceChildren(...doseRows(result).map(row => {
     const div = document.createElement('div'); div.className = 'dose-row';
     const label = document.createElement('div'); label.className = 'dose-label';
     const name = document.createElement('span'); name.className = 'dose-name'; name.textContent = row.name;
@@ -139,19 +139,17 @@ function render() {
     const value = document.createElement('output'); value.className = 'dose-value'; value.textContent = row.value;
     const note = document.createElement('span'); note.className = 'dose-note'; note.textContent = row.note;
     div.append(label);
-    if (row.choice) {
-      const select = document.createElement('select');
-      select.id = 'choice-' + row.choice; select.className = 'dose-choice';
-      select.setAttribute('aria-label', row.name + (row.choice === 'propofol' || row.choice === 'fentanyl' ? ' context' : ' dosing weight'));
-      select.append(new Option(row.choice === 'propofol' || row.choice === 'fentanyl' ? 'Select context' : 'Select dosing weight', ''));
-      CHOICES[row.choice].forEach(option => select.append(new Option(option.label, option.value)));
-      select.value = current.choices[row.choice];
-      select.addEventListener('change', () => {
-        current.choices[row.choice] = select.value; save(); render(); $('choice-' + row.choice).focus();
-      });
-      div.append(select);
-    }
-    div.append(value);
+    if (row.variants) {
+      const variants = document.createElement('dl'); variants.className = 'dose-variants';
+      for (const item of row.variants) {
+        const line = document.createElement('div'); line.className = 'variant';
+        const context = document.createElement('dt'); context.textContent = item.label;
+        const coefficient = document.createElement('small'); coefficient.textContent = item.coefficient; context.append(coefficient);
+        const result = document.createElement('dd'); result.textContent = item.value;
+        line.append(context, result); variants.append(line);
+      }
+      div.append(variants);
+    } else div.append(value);
     if (row.note) div.append(note);
     return div;
   }));
