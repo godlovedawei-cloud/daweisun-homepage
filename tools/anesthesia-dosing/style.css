@@ -42,7 +42,7 @@ legend { width:100%; font-weight:650; border-top:1px solid var(--line); padding:
 .feet-row { margin-top:10px; }
 .input-message { font-size:14px; color:var(--muted); margin-top:16px; }
 .input-message.error { color:#a6321a; }
-.weight-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.weight-grid { margin-top:20px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
 .weight { display:flex; flex-direction:column; align-items:flex-start; gap:5px; border:1px solid var(--line); border-radius:8px; padding:12px; min-width:0; }
 .weight output { font-size:22px; font-weight:650; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .weight small { color:var(--muted); font-size:13px; }
@@ -105,3 +105,23 @@ footer a { display:inline-flex; align-items:center; min-height:44px; }
 .variant dt small { display:block; color:var(--muted); font-size:12px; }
 .variant dd { margin:0; white-space:nowrap; font-size:17px; font-weight:650; font-variant-numeric:tabular-nums; }
 .dose-note { font-size:12px; line-height:1.4; }
+
+/* Phone reference: every drug and expanded dose fits the available width. */
+@media screen and (max-width:649px) {
+ #drug-reference .table-scroll { overflow:visible; min-width:0; }
+ #drug-reference table, #drug-reference tbody, #drug-reference tr,
+ #drug-reference th, #drug-reference td { display:block; width:100%; min-width:0; max-width:100%; }
+ #drug-reference thead { display:none; }
+ #drug-reference tr { border-top:1px solid var(--line); padding:12px 0; }
+ #drug-reference th, #drug-reference td { border:0; padding:0; white-space:normal; overflow-wrap:anywhere; }
+ #drug-reference td:empty { display:none; }
+ #drug-reference td + td { margin-top:6px; }
+ #drug-reference .grp { border:0; padding:22px 0 8px; }
+ #drug-reference .grp > th { padding:0; }
+ #drug-reference .drug-detail-row { padding:0; }
+ #drug-reference .drug-detail > summary { max-width:100%; }
+ #drug-reference .drug-detail .table-scroll { padding-bottom:8px; }
+ #drug-reference .basis { display:inline; margin-left:6px; }
+ #drug-reference .reference-content > .table-scroll > table > tbody > tr:not(.grp):not(.drug-detail-row) > th { margin-bottom:4px; }
+ #drug-reference .reference-content > .table-scroll > table > tbody > tr:not(.grp):not(.drug-detail-row) > td:nth-child(2)::before { content:'Weight: '; color:var(--muted); font-size:14px; }
+}
