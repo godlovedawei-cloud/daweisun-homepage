@@ -121,7 +121,7 @@ function sync(id) {
 function render() {
   const result = calculate(current.sex, current.cm, current.kg);
   const invalid = inputError || (current.cm && current.kg && !result ? 'Check height and weight.' : '');
-  const message = invalid || (current.cm && current.cm < 152.4 ? 'Height <152.4 cm: check weight formulas.' : '');
+  const message = invalid || (current.cm && current.cm < 152.4 ? 'Height <60 in: check weight formulas.' : '');
   $('input-message').textContent = message;
   $('input-message').hidden = !message;
   $('input-message').classList.toggle('error', Boolean(invalid));

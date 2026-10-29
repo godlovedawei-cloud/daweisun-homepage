@@ -29,7 +29,8 @@ export function normalizeChoices(value) {
 }
 export function calculate(sex, cm, kg) {
   if (!['m', 'f'].includes(sex) || ![cm, kg].every(x => Number.isFinite(x) && x > 0)) return null;
-  const ibw = (sex === 'm' ? 50 : 45.5) + 0.91 * (cm - 152.4);
+  const inches = cm / 2.54;
+  const ibw = (sex === 'm' ? 50 : 45.5) + 2.3 * (inches - 60);
   const pbw = ibw;
   const bmi = kg / ((cm / 100) ** 2);
   const lbw = 9270 * kg / (sex === 'm' ? 6680 + 216 * bmi : 8780 + 244 * bmi);
