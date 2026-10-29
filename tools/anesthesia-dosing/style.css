@@ -6,7 +6,7 @@ body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.6 -apple
 .wrap { width:min(820px,100%); margin:auto; padding:24px max(16px,env(safe-area-inset-right)) max(32px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left)); }
 header, section, .reference { margin-bottom:18px; }
 h1,h2,h3,p { margin-top:0; }
-h1 { font:400 clamp(31px,7.4vw,48px)/1.12 Georgia,'Times New Roman',serif; letter-spacing:-.035em; margin-bottom:12px; }
+h1 { font:400 clamp(24px,5vw,34px)/1.15 Georgia,'Times New Roman',serif; letter-spacing:-.035em; margin-bottom:12px; }
 h2 { font-size:19px; font-weight:650; margin-bottom:16px; line-height:1.35; }
 h3 { font-size:17px; font-weight:650; }
 p { margin-bottom:12px; }
