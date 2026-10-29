@@ -7,7 +7,8 @@ PUBS = json.loads((ROOT / 'data/publications.json').read_text())
 CLINICAL = json.loads((ROOT / 'data/clinical-experience.json').read_text())
 E = html.escape
 EMAIL = 'dawei.sun.md@gmail.com'
-DATE = 'October 14, 2026'
+DATE = 'October 28, 2026'
+SHOW_CLINICAL_VOLUMES = False
 CV = '/assets/Dawei-Sun-CV.pdf'
 ORCID = 'https://orcid.org/0000-0002-6631-8527'
 SCHOLAR = 'https://scholar.google.com/citations?user=Jt5Ds1kAAAAJ&hl=en'
@@ -42,8 +43,7 @@ PRESENTATIONS = [
 
 
 BIOGRAPHY = ('I am an anesthesiologist and researcher trained at Shanghai Jiao Tong University and Zhejiang University, '
-             'with visiting research experience at UCSF. My residency log includes approximately 600 general anesthetics and '
-             '600 monitored anesthesia care encounters; I subsequently practiced as an anesthesiologist for an additional year. '
+             'with visiting research experience at UCSF. '
              'My clinical experience includes regional anesthesia, perioperative care, and helping establish a preoperative anesthesia clinic. '
              'My research spans cerebral ischemia, neuroprotection, and clinical questions about oxygen delivery and patient blood management. '
              'In 2026, an October observership at Torrance Memorial Hospital and a planned November observership at University of Utah Hospital '
@@ -57,6 +57,8 @@ def profiles():
 
 
 def torrance_counts():
+    if not SHOW_CLINICAL_VOLUMES:
+        return ''
     fields = ''.join(
         f'<span>{E(label)}: <span class="observation-count">'
         + (f'{value:,}' if value is not None else '<span aria-label="Not yet entered">—</span>')
@@ -147,7 +149,7 @@ def header(publications=False):
 def footer():
     return f'''<footer class="wrap footer">
 <span>© 2026 Dawei Sun · <a href="mailto:{EMAIL}">{EMAIL}</a></span>
-<span>Updated <time datetime="2026-10-14">{DATE}</time> · <a href="/#main">Back to top ↑</a></span>
+<span>Updated <time datetime="2026-10-28">{DATE}</time> · <a href="/#main">Back to top ↑</a></span>
 </footer></body></html>'''
 
 
@@ -220,7 +222,8 @@ clinical = '''<ul class="clinical-list">
 <figcaption><strong>Preoperative anesthesia clinic</strong><span>Clinical work at the Second Affiliated Hospital, Zhejiang University School of Medicine.</span></figcaption>
 </figure>
 </div>'''
-clinical += clinical_tables()
+if SHOW_CLINICAL_VOLUMES:
+    clinical += clinical_tables()
 clinical += '<div class="qualification"><h3>Licensure &amp; Qualifications</h3><ul>' + ''.join(f'<li>{E(line)}</li>' for line in QUALIFICATIONS) + '</ul></div>'
 research = '<p class="research-statement">' + (
     'My clinical research examines how physiologic indicators of oxygen delivery and utilization can inform perioperative care and patient blood management. '
@@ -326,25 +329,24 @@ def build_cv():
  entry('November 2026 - Four weeks, planned','Clinical Observer','University of Utah Hospital, United States','Department of Anesthesiology, Perioperative & Pain Medicine')
  entry('October 2026 - Four weeks, in progress','Clinical Observer','Torrance Memorial Hospital, Torrance, California, United States','Department of Anesthesiology')
  confirmed_counts = [f'{label}: {value:,}' for label, value in TORRANCE_OBSERVATION_COUNTS.items() if value is not None]
- if confirmed_counts: add(xml_escape(' · '.join(confirmed_counts)))
+ if SHOW_CLINICAL_VOLUMES and confirmed_counts: add(xml_escape(' · '.join(confirmed_counts)))
  sec('RESEARCH FUNDING')
  entry('2024 - 2026','Principal Investigator - NSFC Young Scientists Fund','National Natural Science Foundation of China - Project No. 82302479',GRANT_TITLE+'.')
  sec('PATENT')
  add('<b>First inventor.</b> Sun D, Luo G, Yao Y, Yan M. Continuous oxygen saturation monitoring probe for insertion into a central venous catheter. Chinese Utility Model Patent, ZL 2024 2 3305545.1. Granted April 21, 2026.')
  add('A probe designed for placement within a central venous catheter to continuously monitor central venous oxygen saturation (ScvO2), intended to help assess the balance between oxygen delivery and consumption in real time. A utility model protects a technical product design.')
- story.append(PageBreak())
- sec('CLINICAL EXPERIENCE IN NUMBERS')
- add('Rounded residency records and estimated cumulative experience through October 2024. Categories overlap; no unique patient total is implied.','note')
- for group in CLINICAL['groups']:
-  add('<b>'+xml_escape(group['title'])+'</b>')
-  rows=[[text('Category','cellhead'),text('Residency log<br/>~July 2023','cellhead'),text('Cumulative estimate<br/>October 2024','cellhead')]]
-  rows += [[text(xml_escape(row['label']),'cell'),text('~'+str(row['logged']),'cell'),text('~'+str(row['estimated']),'cell')] for row in group['rows']]
-  table=Table(rows,colWidths=[287,105,115],repeatRows=1,hAlign='LEFT')
-  table.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('BACKGROUND',(0,0),(-1,0),colors.HexColor('#edf1ed')),('LINEBELOW',(0,0),(-1,-1),0.35,colors.HexColor('#dde1de')),('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),('TOPPADDING',(0,0),(-1,-1),4),('BOTTOMPADDING',(0,0),(-1,-1),4)]))
-  story.append(table);story.append(Spacer(1,11))
- add(xml_escape(CLINICAL['methodology']),'note')
- sec('SCIENTIFIC PRESENTATIONS AND HONORS')
- for y,title,authors,where in PRESENTATIONS:story.append(KeepTogether([text(xml_escape(y+'. '+authors+' '+title+' '+where+'.'))]))
+ if SHOW_CLINICAL_VOLUMES:
+  story.append(PageBreak())
+  sec('CLINICAL EXPERIENCE IN NUMBERS')
+  add('Rounded residency records and estimated cumulative experience through October 2024. Categories overlap; no unique patient total is implied.','note')
+  for group in CLINICAL['groups']:
+   add('<b>'+xml_escape(group['title'])+'</b>')
+   rows=[[text('Category','cellhead'),text('Residency log<br/>~July 2023','cellhead'),text('Cumulative estimate<br/>October 2024','cellhead')]]
+   rows += [[text(xml_escape(row['label']),'cell'),text('~'+str(row['logged']),'cell'),text('~'+str(row['estimated']),'cell')] for row in group['rows']]
+   table=Table(rows,colWidths=[287,105,115],repeatRows=1,hAlign='LEFT')
+   table.setStyle(TableStyle([('VALIGN',(0,0),(-1,-1),'TOP'),('BACKGROUND',(0,0),(-1,0),colors.HexColor('#edf1ed')),('LINEBELOW',(0,0),(-1,-1),0.35,colors.HexColor('#dde1de')),('LEFTPADDING',(0,0),(-1,-1),7),('RIGHTPADDING',(0,0),(-1,-1),7),('TOPPADDING',(0,0),(-1,-1),4),('BOTTOMPADDING',(0,0),(-1,-1),4)]))
+   story.append(table);story.append(Spacer(1,11))
+  add(xml_escape(CLINICAL['methodology']),'note')
  story.append(PageBreak())
  sec('PEER-REVIEWED PUBLICATIONS')
  add('Ordered by CV publication year, including online-first dates. First, co-first, and corresponding authorship are marked.','note')
@@ -354,6 +356,8 @@ def build_cv():
   if p['role']:s+=f' <font color="#bf391b"><b>({p["role"]})</b></font>'
   if p.get('doi'):s+=f' DOI: <link href="https://doi.org/{xml_escape(p["doi"])}">{xml_escape(p["doi"])}</link>.'
   story.append(KeepTogether([text(s,'pub')]))
+ sec('SCIENTIFIC PRESENTATIONS AND HONORS')
+ for y,title,authors,where in PRESENTATIONS:story.append(KeepTogether([text(xml_escape(y+'. '+authors+' '+title+' '+where+'.'))]))
  sec('PROFESSIONAL SERVICE AND LEADERSHIP')
  add('<b>Volunteer Service - Ad Hoc Peer Reviewer, 2024 - Present</b><br/>Completed 53 peer-review assignments across 17 journals, as of September 2026, including ' + ', '.join(REVIEW_HIGHLIGHTS) + ', and 12 other journals.')
  add('<b>President, Graduate Student Union</b>, Shanghai Jiao Tong University Affiliated Sixth Hospital, China, 2017 - 2018.')

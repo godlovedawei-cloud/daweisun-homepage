@@ -32,13 +32,13 @@ The owner confirmed Step 1, Step 2 CK, and OET passes, ECFMG certification in 20
 
 UCSF visiting research was mentored by Donna Ferriero. ORCID 0000-0002-6631-8527 and Google Scholar Jt5Ds1kAAAAJ were confirmed by the owner; the Scholar link is also listed in the public ORCID profile. No unverified reviewer or bibliography profile is linked.
 
-Torrance surgical-case and nerve-block observation counts are intentionally unset in `TORRANCE_OBSERVATION_COUNTS`. The website displays a dash rather than zero; the CV omits unset counts. Fill these fields only with confirmed observation-log numbers. These counts concern procedures observed, separately from prior clinical procedures performed. Homepage ASA entries include the meeting name and city from the presentation records.
+Clinical volumes and Torrance count placeholders are omitted from both the website and public CV at the owner’s request on October 28, 2026. `SHOW_CLINICAL_VOLUMES` is disabled. Retained aggregate data and rendering code are for possible future fellowship applications; do not re-enable them without a new request. The introductory biography also omits case counts. Homepage ASA entries include the meeting name and city from the presentation records.
 
-## Clinical counts
+## Clinical counts (not displayed)
 
-Public numbers are aggregate anesthesia records extracted read-only from the owner's training workbook, sheet 数据, skill-name/count columns N:O, rows 8–29. The owner identifies the coverage as through approximately July 2023. The workbook uses a batch-entry date rather than individual case dates. ICU rotation records are not used in the quantitative tables.
+Previously displayed numbers were aggregate anesthesia records extracted read-only from the owner's training workbook, sheet 数据, skill-name/count columns N:O, rows 8–29. The owner identifies the coverage as through approximately July 2023. The workbook uses a batch-entry date rather than individual case dates. ICU rotation records are not used in the quantitative tables.
 
-Two columns distinguish residency records from cumulative self-estimates through October 2024. Estimates use the **original**, unrounded residency count × 4/3, then round half-up to the nearest ten. The displayed residency records are also rounded to tens. Categories overlap, so there is no summed unique patient total. No block subtype, difficult-airway, or TEE count is inferred. The source workbook, reviewer names, and individual clinical records are not committed.
+The retained data distinguish residency records from cumulative self-estimates through October 2024. Estimates use the **original**, unrounded residency count × 4/3, then round half-up to the nearest ten. The displayed residency records are also rounded to tens. Categories overlap, so there is no summed unique patient total. No block subtype, difficult-airway, or TEE count is inferred. The source workbook, reviewer names, and individual clinical records are not committed.
 
 The owner also confirmed participation in establishing the preoperative anesthesia clinic: screening criteria, assessment workflows, IT optimization, critical-value alerts/escalation, and interdepartmental communication. Wording reflects a contributing role without an invented formal management title or measured efficiency improvement.
 
@@ -56,7 +56,7 @@ All 24 papers remain visible; first, co-first, and corresponding authorship are 
 
 The Global Spine Journal article shows its 2023 online and 2025 print dates and remains under 2023 to match the CV. The European Journal of Preventive Cardiology paper shows its November 24, 2025 online date; Crossref had no volume/issue assignment at the check. Chinese-language articles are marked, Factor XI and iTRAQ typography are normalized, and verified DOI links are used. No third-party full-text PDFs are hosted.
 
-The public CV omits the phone number, follows the same reviewed facts and counts as the website, and ends with “Updated October 2026”. Original documents remain untouched.
+The public CV omits the phone number and clinical volumes, follows the same reviewed facts as the website, and ends with “Updated October 2026”. Original documents remain untouched.
 
 ## Verification
 
