@@ -7,11 +7,13 @@ near(male.lbw, 78.95528617727304); near(male.adj, 98.3084); near(male.bmi, 43.05
 const rows = doseRows(male);
 assert.equal(rows.length, 8);
 assert.deepEqual(rows[1].variants.map(r => r.value), ['158–197 mg', '79–118 mg', '39–118 mg', '79–158 mg']);
-assert.deepEqual(rows[2].variants.map(r => r.value), ['39–79 μg', '79–237 μg', '25–50 μg', '39–158 μg', '79–158 μg/h', '25–50 μg', '790–1974 μg']);
-assert.equal(rows[2].name, 'Fentanyl'); assert.match(rows[2].note, /Clinical practice, not label/);
-assert.match(rows[2].variants[4].coefficient, /postop ventilation planned/);
-assert.match(rows[2].variants[6].coefficient, /selected cardiac; postop ventilation planned/);
-assert.match(rows[2].variants[3].coefficient, /total/);
+assert.deepEqual(rows[2].variants.map(r => r.value), ['79–158 μg', '158–316 μg', '55–118 μg', '2–3 μg/kg']);
+assert.equal(rows[2].name, 'Fentanyl'); assert.equal(rows[2].scalar, 'Adult LBW');
+assert.match(rows[2].variants[0].coefficient, /IV initial · 1–2 μg\/kg/);
+assert.match(rows[2].variants[1].coefficient, /IV initial · 2–4 μg\/kg/);
+assert.match(rows[2].variants[2].coefficient, /IM \/ IV · 0.7–1.5 μg\/kg/);
+assert.match(rows[2].variants[3].label, /Pediatric analgesia · 2–12 years/);
+assert.equal(rows[2].variants[3].coefficient, 'Reference only');
 assert.equal(rows[3].scalar, 'TBW'); assert.equal(rows[3].value, '82 mg');
 assert.equal(rows[4].scalar, 'TBW'); assert.equal(rows[4].value, '163 mg');
 assert.match(rows[3].note, /US label/); assert.match(rows[4].note, /US label/);
@@ -27,6 +29,7 @@ near(female.ibw, 57.057); near(female.pbw, 57.057); near(female.lbw, 52.27984923
 near(female.adj, 74.2342); near(female.bmi, 36.68646390547219);
 assert.equal(doseRows(female)[0].value, '342–456 mL');
 assert.equal(doseRows(female)[1].variants[0].value, '105–131 mg');
+assert.deepEqual(doseRows(female)[2].variants.map(r => r.value), ['52–105 μg', '105–209 μg', '37–78 μg', '2–3 μg/kg']);
 const underweight = calculate('m', 180, 50);
 near(underweight.ibw, 75.116); near(underweight.adj, 65.0696);
 assert.equal(dosingWeight(underweight, 'ibw'), 50); assert.equal(dosingWeight(underweight, 'adj'), 50);
@@ -49,7 +52,8 @@ assert.equal(calculate('x', 177.8, 100), null); assert.equal(calculate('f', 1, 1
 
 for (const weight of [50, 100, 200]) {
   const fent = doseRows(calculate('m', 177.8, weight))[2].variants;
-  assert.equal(fent[2].value, '25–50 μg'); assert.equal(fent[5].value, '25–50 μg');
-  assert.match(fent[4].value, /μg\/h$/);
+  assert.equal(fent.length, 4);
+  assert.equal(fent[3].value, '2–3 μg/kg');
+  assert.equal(fent[3].coefficient, 'Reference only');
 }
-console.log('PASS: both sexes, all Propofol and 7 clinical-practice Fentanyl uses without selection, fixed rocuronium TBW, ignored legacy choices, weight formulas, short heights, units, 120 kg threshold.');
+console.log('PASS: both sexes, three adult Fentanyl calculations, pediatric reference never scaled by adult weight, all Propofol contexts, fixed rocuronium TBW, legacy choices, formulas, units, 120 kg threshold.');
