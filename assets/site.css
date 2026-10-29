@@ -192,6 +192,8 @@ p { margin-bottom: 13px; }
 /* Biography and detailed dates in the reverse chronological timeline. */
 .hero-layout.with-portrait { column-gap: 70px; row-gap: 30px; }
 .bio { grid-column: 1 / -1; max-width: 880px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.85; }
+.bio p { margin-bottom: 20px; }
+.bio p:last-child { margin-bottom: 0; }
 .timeline-item { grid-template-columns: 210px minmax(0,1fr); gap: 30px; }
 .timeline-date { font-size: 12px; }
 .research-statement { color: var(--muted); font-size: 15px; line-height: 1.9; margin-bottom: 0; }

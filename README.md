@@ -32,7 +32,7 @@ The owner confirmed Step 1, Step 2 CK, and OET passes, ECFMG certification in 20
 
 UCSF visiting research was mentored by Donna Ferriero. ORCID 0000-0002-6631-8527 and Google Scholar Jt5Ds1kAAAAJ were confirmed by the owner; the Scholar link is also listed in the public ORCID profile. No unverified reviewer or bibliography profile is linked.
 
-The clinical-volume tables and Torrance count placeholders are omitted from both the website and public CV at the owner’s request on October 28, 2026. In a subsequent clarification, the owner supplied residency case counts for inclusion only within that experience: adult anesthesia 1,200 (including cardiac, neurosurgical, and emergency anesthesia), obstetric/gynecologic anesthesia 140, and pediatric anesthesia 220. These are owner-supplied counts and do not derive from the earlier estimation table. `SHOW_CLINICAL_VOLUMES` is disabled. Retained aggregate data and rendering code are for possible future fellowship applications; do not re-enable them without a new request. The introductory biography also omits case counts. Homepage ASA entries include the meeting name and city from the presentation records.
+The clinical-volume tables and Torrance count placeholders are omitted from both the website and public CV at the owner’s request on October 28, 2026. In a subsequent clarification, the owner supplied residency case counts for inclusion only within that experience: adult anesthesia 1,200 (including cardiac, neurosurgical, and emergency anesthesia), obstetric/gynecologic anesthesia 140, and pediatric anesthesia 220. These are owner-supplied counts and do not derive from the earlier estimation table. `SHOW_CLINICAL_VOLUMES` is disabled. Retained aggregate data and rendering code are for possible future fellowship applications; do not re-enable them without a new request. Homepage ASA entries include the meeting name and city from the presentation records.
 
 ## Clinical counts (not displayed)
 
@@ -56,7 +56,7 @@ All 24 papers remain visible; first, co-first, and corresponding authorship are 
 
 The Global Spine Journal article shows its 2023 online and 2025 print dates and remains under 2023 to match the CV. The European Journal of Preventive Cardiology paper shows its November 24, 2025 online date; Crossref had no volume/issue assignment at the check. Chinese-language articles are marked, Factor XI and iTRAQ typography are normalized, and verified DOI links are used. No third-party full-text PDFs are hosted.
 
-The public CV omits the phone number and clinical volumes, follows the same reviewed facts as the website, and ends with “Updated October 2026”. Original documents remain untouched.
+The public CV omits the phone number and clinical-volume tables, follows the same reviewed facts as the website, and ends with “Updated October 2026”. Original documents remain untouched.
 
 ## Verification
 
@@ -65,3 +65,7 @@ Check desktop, tablet, and mobile layout; keyboard skip navigation; anchor targe
 ## Experience details — October 28, 2026
 
 The owner supplied residency rotations in emergency medicine, intensive care, cardiology, neurology, and endocrinology; management of the preoperative preparation area for arterial lines, CVC placement, and peripheral nerve blocks; and clinical postdoctoral study implementation leadership in intraoperative oxygen supply–demand balance during cardiac and major vascular surgery. The study figures are 1,560 cardiac surgery patients enrolled and 314 included in the final analysis; no reason for exclusions is inferred. UCSF research concerned neonatal hypoxic-ischemic encephalopathy, and Ph.D. research concerned cerebral ischemia. These details are shared between the website and CV.
+
+## Homepage introduction — October 28, 2026
+
+The homepage introduction uses the five English paragraphs supplied by the owner, including physician-scientist identity, more than 1,500 residency cases, the 344-patient ciprofol trial, cardiac-surgery oxygen research, UK Biobank studies, and explicit U.S. fellowship intent. Wording is owner-supplied. This introduction update does not modify the public CV. Paragraph spacing preserves readability on mobile and desktop.

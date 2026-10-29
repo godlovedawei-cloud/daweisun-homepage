@@ -52,12 +52,13 @@ PRESENTATIONS = [
 ]
 
 
-BIOGRAPHY = ('I am an anesthesiologist and researcher trained at Shanghai Jiao Tong University and Zhejiang University, '
-             'with visiting research experience at UCSF. '
-             'My clinical experience includes regional anesthesia, perioperative care, and helping establish a preoperative anesthesia clinic. '
-             'My research spans cerebral ischemia, neuroprotection, and clinical questions about oxygen delivery and patient blood management. '
-             'In 2026, an October observership at Torrance Memorial Hospital and a November observership at University of Utah Hospital '
-             'support my clinical re-engagement and familiarity with U.S. anesthesiology practice.')
+BIOGRAPHY_PARAGRAPHS = [
+    'I am an anesthesiologist and physician-scientist. I completed anesthesiology residency at the Second Affiliated Hospital of Zhejiang University School of Medicine, managing more than 1,500 cases across cardiac, neurosurgical, obstetric, and pediatric anesthesia, and then practiced there as an anesthesiologist, where I helped build the hospital’s preoperative anesthesia clinic.',
+    'In the laboratory, I study how to protect the brain when its blood and oxygen supply is interrupted, as in cardiac arrest or oxygen deprivation at birth. I began this work during my Ph.D. at Shanghai Jiao Tong University, extended it to the newborn brain with Donna Ferriero at UCSF, and now lead it as principal investigator on a National Natural Science Foundation of China grant.',
+    'My clinical research addresses practical questions in everyday anesthesia care. I led a randomized, double-blind trial in 344 patients showing that ciprofol, a newer alternative to propofol with less hypotension and injection pain, can be used alone for upper endoscopy sedation, without an added opioid, as effectively as ciprofol plus fentanyl, while keeping breathing and blood pressure steadier. I also led a prospective study in cardiac surgery testing whether the difference between arterial and venous oxygen levels can tell clinicians when a blood transfusion is truly needed. That work was selected for oral presentation at the 2024 ASA Annual Meeting and led me to design a probe for continuous venous oxygen monitoring.',
+    'I have also helped develop large population studies using the UK Biobank, each including more than 160,000 participants, on how lifestyle and cardiovascular health shape heart disease and disease-free life expectancy.',
+    'I am ECFMG-certified and seeking clinical fellowship training in anesthesiology in the United States.',
+]
 REVIEW_JOURNALS = ['International Journal of Surgery', 'Anesthesiology and Perioperative Science', 'Journal of Clinical Anesthesia', 'Drug Design, Development and Therapy', 'International Journal of Molecular Sciences', 'Journal of Clinical Medicine', 'Brazilian Journal of Anesthesiology', 'Abdominal Radiology', 'Anesthesia Research', 'Biomedicines', 'Emergency Care and Medicine', 'Healthcare', 'Journal of Anesthesia and Translational Medicine', 'Journal of Personalized Medicine', 'Journal of Vascular Diseases', 'Methods and Protocols', 'Open Medicine']
 REVIEW_HIGHLIGHTS = ['Journal of Clinical Anesthesia', 'International Journal of Surgery', 'Brazilian Journal of Anesthesiology', 'Anesthesiology and Perioperative Science', 'Journal of Anesthesia and Translational Medicine']
 
@@ -189,7 +190,7 @@ hero = f'''<body>{header()}
 <div class="buttons"><a class="button" href="{CV}">Download CV <span aria-hidden="true">↓</span></a></div>
 {profiles()}
 </div>{portrait_html}
-<p class="bio">{E(BIOGRAPHY)}</p>
+<div class="bio">{''.join(f'<p>{E(paragraph)}</p>' for paragraph in BIOGRAPHY_PARAGRAPHS)}</div>
 </div></section>'''
 timeline = '<ol class="career-timeline">'
 timeline += timeline_entry('November 2026', 'Clinical Observer', 'University of Utah Hospital<br>Department of Anesthesiology, Perioperative &amp; Pain Medicine', 'Four-week clinical observership.')
