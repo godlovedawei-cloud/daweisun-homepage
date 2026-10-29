@@ -261,7 +261,7 @@ grants = f'''<dl class="academic-list">
 </dl>'''
 patent = '''<h3>Continuous oxygen saturation monitoring probe</h3><p>A probe designed for placement within a central venous catheter to continuously monitor central venous oxygen saturation (ScvO₂), with the intended application of assessing the balance between oxygen delivery and consumption in real time.</p><p>First inventor · Chinese Utility Model Patent ZL 2024 2 3305545.1. Granted April 21, 2026. A utility model protects a technical product design.</p>'''
 contributions = f'''<dl class="academic-list">
-<div><dt>Volunteer service</dt><dd><strong>Ad Hoc Peer Reviewer · 2024–Present</strong><p>53 peer-review assignments across 17 journals, as of September 2026. Journals include:</p>{journal_list}</dd></div>
+<div><dt>Volunteer service</dt><dd><strong>Ad Hoc Peer Reviewer · 2024–Present</strong><p>50+ peer-review assignments across 17 journals, as of September 2026. Journals include:</p>{journal_list}</dd></div>
 <div><dt>Leadership</dt><dd><strong>President, Graduate Student Union · 2017–2018</strong><p>Shanghai Jiao Tong University Affiliated Sixth Hospital</p><strong>Vice President, Student Union · 2014–2015</strong><p>Wenzhou Medical University</p></dd></div>
 </dl>'''
 home = head('Dawei Sun, M.D., Ph.D. | Anesthesiologist & Researcher', 'Education, clinical experience, research, publications, and curriculum vitae of Dawei Sun, M.D., Ph.D.') + hero
@@ -370,7 +370,7 @@ def build_cv():
  sec('SCIENTIFIC PRESENTATIONS AND HONORS')
  for y,title,authors,where in PRESENTATIONS:story.append(KeepTogether([text(xml_escape(y+'. '+authors+' '+title+' '+where+'.'))]))
  sec('PROFESSIONAL SERVICE AND LEADERSHIP')
- add('<b>Volunteer Service - Ad Hoc Peer Reviewer, 2024 - Present</b><br/>Completed 53 peer-review assignments across 17 journals, as of September 2026, including ' + ', '.join(REVIEW_HIGHLIGHTS) + ', and 12 other journals.')
+ add('<b>Volunteer Service - Ad Hoc Peer Reviewer, 2024 - Present</b><br/>Completed 50+ peer-review assignments across 17 journals, as of September 2026, including ' + ', '.join(REVIEW_HIGHLIGHTS) + ', and 12 other journals.')
  add('<b>President, Graduate Student Union</b>, Shanghai Jiao Tong University Affiliated Sixth Hospital, China, 2017 - 2018.')
  add('<b>Vice President, Student Union</b>, Wenzhou Medical University, China, 2014 - 2015.')
  add('Updated October 2026','note')
