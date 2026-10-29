@@ -126,7 +126,8 @@ p { margin-bottom: 13px; }
   .hero-role { font-size: 18px; }
 }
 @media (max-width: 600px) {
-  html { scroll-padding-top: 150px; }
+  html { scroll-padding-top: 20px; }
+  .site-header { position: static; }
   .wrap { width: calc(100% - 40px); }
   .header-inner { flex-direction: column; align-items: flex-start; gap: 11px; padding-block: 12px; }
   .nav { justify-content: flex-start; width: 100%; gap: 0 17px; }
