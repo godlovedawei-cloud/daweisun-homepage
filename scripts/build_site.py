@@ -15,7 +15,17 @@ SCHOLAR = 'https://scholar.google.com/citations?user=Jt5Ds1kAAAAJ&hl=en'
 GRANT_TITLE = 'Protective effects and mechanisms of HIF-2α in immature brain hypoxic-ischemic injury through regulation of mitophagy'
 POSTDOC_NOTE = ('China’s clinical postdoctoral program integrates research with standardized residency training. '
                 'This appointment overlapped my residency and the beginning of my subsequent anesthesiologist role.')
-OBSERVER_FOCUS = 'Regional anesthesia, preoperative assessment, intensive care, and operating-room general anesthesia.'
+POSTDOC_RESEARCH = ('Led the implementation of a clinical study of intraoperative oxygen supply–demand balance in cardiac and major vascular surgery. '
+                    'A total of 1,560 cardiac surgery patients were enrolled, with 314 included in the final analysis.')
+RESIDENCY_DETAIL = ('Standardized Residency Training (national program), three years. '
+                    'Adult anesthesia: 1,200 cases, including cardiac, neurosurgical, and emergency anesthesia; '
+                    'obstetric and gynecologic anesthesia: 140 cases; pediatric anesthesia: 220 cases. '
+                    'Rotations included emergency medicine, intensive care, cardiology, neurology, and endocrinology.')
+ANESTHESIOLOGIST_DETAIL = ('Surgical anesthesia, research, participation in establishing the preoperative anesthesia clinic, '
+                          'and management of the preoperative preparation area for arterial line placement, '
+                          'central venous catheterization, and peripheral nerve blocks.')
+UCSF_RESEARCH = 'Research on neonatal hypoxic-ischemic encephalopathy. Research mentor: Donna M. Ferriero.'
+PHD_RESEARCH = 'Research on cerebral ischemia.'
 # Fill only from the confirmed Torrance observation log; None means not yet entered.
 TORRANCE_OBSERVATION_COUNTS = {'Surgical cases observed': None, 'Nerve blocks observed': None}
 QUALIFICATIONS = [
@@ -46,7 +56,7 @@ BIOGRAPHY = ('I am an anesthesiologist and researcher trained at Shanghai Jiao T
              'with visiting research experience at UCSF. '
              'My clinical experience includes regional anesthesia, perioperative care, and helping establish a preoperative anesthesia clinic. '
              'My research spans cerebral ischemia, neuroprotection, and clinical questions about oxygen delivery and patient blood management. '
-             'In 2026, an October observership at Torrance Memorial Hospital and a planned November observership at University of Utah Hospital '
+             'In 2026, an October observership at Torrance Memorial Hospital and a November observership at University of Utah Hospital '
              'support my clinical re-engagement and familiarity with U.S. anesthesiology practice.')
 REVIEW_JOURNALS = ['International Journal of Surgery', 'Anesthesiology and Perioperative Science', 'Journal of Clinical Anesthesia', 'Drug Design, Development and Therapy', 'International Journal of Molecular Sciences', 'Journal of Clinical Medicine', 'Brazilian Journal of Anesthesiology', 'Abdominal Radiology', 'Anesthesia Research', 'Biomedicines', 'Emergency Care and Medicine', 'Healthcare', 'Journal of Anesthesia and Translational Medicine', 'Journal of Personalized Medicine', 'Journal of Vascular Diseases', 'Methods and Protocols', 'Open Medicine']
 REVIEW_HIGHLIGHTS = ['Journal of Clinical Anesthesia', 'International Journal of Surgery', 'Brazilian Journal of Anesthesiology', 'Anesthesiology and Perioperative Science', 'Journal of Anesthesia and Translational Medicine']
@@ -182,14 +192,14 @@ hero = f'''<body>{header()}
 <p class="bio">{E(BIOGRAPHY)}</p>
 </div></section>'''
 timeline = '<ol class="career-timeline">'
-timeline += timeline_entry('November 2026', 'Clinical Observer', 'University of Utah Hospital<br>Department of Anesthesiology, Perioperative &amp; Pain Medicine', 'Planned · Four-week observership. Planned areas of observation: ' + E(OBSERVER_FOCUS))
-timeline += timeline_entry('October 2026', 'Clinical Observer', 'Torrance Memorial Hospital<br>Department of Anesthesiology · Torrance, California', 'In progress · Four-week observership. Areas of observation: ' + E(OBSERVER_FOCUS) + torrance_counts())
+timeline += timeline_entry('November 2026', 'Clinical Observer', 'University of Utah Hospital<br>Department of Anesthesiology, Perioperative &amp; Pain Medicine', 'Four-week clinical observership.')
+timeline += timeline_entry('October 2026', 'Clinical Observer', 'Torrance Memorial Hospital<br>Department of Anesthesiology · Torrance, California', 'Four-week clinical observership.' + torrance_counts())
 timeline += timeline_entry('November 2024 – Present', 'Associate Researcher', INSTITUTION, 'Cerebral ischemia and neuroprotection, with a focus on autophagy and mitophagy.')
-timeline += timeline_entry('September 2023 – October 2024', 'Anesthesiologist', HOSPITAL, 'Contributed to establishing the preoperative anesthesia clinic and improving its workflows.')
-timeline += timeline_entry('September 2020 – February 2024', 'Clinical Postdoctoral Fellow', 'Zhejiang University', E(POSTDOC_NOTE))
-timeline += timeline_entry('September 2020 – August 2023', 'Residency in Anesthesiology', HOSPITAL, 'Standardized Residency Training (national program), three years, including an intensive care unit (ICU) rotation.')
-timeline += timeline_entry('October 2018 – October 2019', 'Visiting Scholar', 'University of California San Francisco', 'Neurology &amp; Pediatrics · Research mentor: Donna M. Ferriero')
-timeline += timeline_entry('September 2015 – June 2020', 'Ph.D. in Anesthesiology', 'Shanghai Jiao Tong University')
+timeline += timeline_entry('September 2023 – October 2024', 'Anesthesiologist', HOSPITAL, E(ANESTHESIOLOGIST_DETAIL))
+timeline += timeline_entry('September 2020 – February 2024', 'Clinical Postdoctoral Fellow', 'Zhejiang University', E(POSTDOC_RESEARCH) + '<br><br>' + E(POSTDOC_NOTE))
+timeline += timeline_entry('September 2020 – August 2023', 'Residency in Anesthesiology', HOSPITAL, E(RESIDENCY_DETAIL))
+timeline += timeline_entry('October 2018 – October 2019', 'Visiting Scholar', 'University of California San Francisco', 'Neurology &amp; Pediatrics · ' + E(UCSF_RESEARCH))
+timeline += timeline_entry('September 2015 – June 2020', 'Ph.D. in Anesthesiology', 'Shanghai Jiao Tong University', E(PHD_RESEARCH))
 timeline += timeline_entry('October 2010 – July 2015', 'Bachelor of Medicine in Medicine', 'Wenzhou Medical University')
 timeline += '</ol>'
 clinical = '''<ul class="clinical-list">
@@ -312,22 +322,22 @@ def build_cv():
  sec('EDUCATION AND TRAINING')
  for _,role,inst,date in TRAINING:
   detail = ''
-  if role.startswith('Residency'): detail='Standardized Residency Training (national program), three years, including an intensive care unit (ICU) rotation.'
-  if role.startswith('Clinical Postdoctoral'): detail=POSTDOC_NOTE
+  if role.startswith('Residency'): detail=RESIDENCY_DETAIL
+  if role.startswith('Clinical Postdoctoral'): detail=POSTDOC_RESEARCH+' '+POSTDOC_NOTE
+  if role.startswith('Ph.D.'): detail=PHD_RESEARCH
   entry(date,role.replace('·','-'),inst,detail)
   if role.startswith('Ph.D.'):
-   entry('October 2018 - October 2019','Visiting Scholar - Neurology and Pediatrics','University of California San Francisco, United States','Research mentor: Donna M. Ferriero')
+   entry('October 2018 - October 2019','Visiting Scholar - Neurology and Pediatrics','University of California San Francisco, United States',UCSF_RESEARCH)
  sec('LICENSURE AND PROFESSIONAL QUALIFICATIONS')
  for line in QUALIFICATIONS:add(xml_escape(line))
  story.append(PageBreak())
  sec('PROFESSIONAL EXPERIENCE')
  entry('November 2024 - Present','Associate Researcher',INSTITUTION.replace('’',"'")+', Hangzhou, China','Research on cerebral ischemia and neuroprotection, with a focus on autophagy and mitophagy.')
- entry('September 2023 - October 2024','Anesthesiologist',HOSPITAL+', Hangzhou, China')
- for s in ['Provided perioperative anesthesia care, including induction, intraoperative management, emergence, and postoperative handoff, with senior consultation for complex cases.','Staffed and helped establish the preoperative anesthesia clinic, including patient screening, risk assessment, patient optimization, and assessment workflows.','Supported clinic IT optimization, critical-value alerts and escalation, and preoperative communication across departments.','Performed ultrasound-guided peripheral nerve blocks and vascular access; taught international medical students through operating-room orientation and case discussions.']:add('- '+s)
+ entry('September 2023 - October 2024','Anesthesiologist',HOSPITAL+', Hangzhou, China',ANESTHESIOLOGIST_DETAIL)
+ for s in ['Supported preoperative clinic patient screening and assessment workflows, IT optimization, critical-value alerts and escalation, and communication across departments.','Taught international medical students through operating-room orientation and case discussions.']:add('- '+s)
  sec('U.S. CLINICAL OBSERVERSHIPS')
- add('Observational focus: '+OBSERVER_FOCUS)
- entry('November 2026 - Four weeks, planned','Clinical Observer','University of Utah Hospital, United States','Department of Anesthesiology, Perioperative & Pain Medicine')
- entry('October 2026 - Four weeks, in progress','Clinical Observer','Torrance Memorial Hospital, Torrance, California, United States','Department of Anesthesiology')
+ entry('November 2026 - Four weeks','Clinical Observer','University of Utah Hospital, United States','Department of Anesthesiology, Perioperative & Pain Medicine')
+ entry('October 2026 - Four weeks','Clinical Observer','Torrance Memorial Hospital, Torrance, California, United States','Department of Anesthesiology')
  confirmed_counts = [f'{label}: {value:,}' for label, value in TORRANCE_OBSERVATION_COUNTS.items() if value is not None]
  if SHOW_CLINICAL_VOLUMES and confirmed_counts: add(xml_escape(' · '.join(confirmed_counts)))
  sec('RESEARCH FUNDING')
