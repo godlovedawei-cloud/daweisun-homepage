@@ -52,7 +52,7 @@ export function doseRows(r) {
     { name: 'Propofol induction', scalar: 'LBW', kind: 'lbw',
       variants: [variant('<65 · ASA I–II', 2, 2.5, 'mg'), variant('Elderly / frail / ASA III–IV', 1, 1.5, 'mg'), variant('Cardiac', 0.5, 1.5, 'mg'), variant('Neurosurgical', 1, 2, 'mg')],
       note: 'US label ranges · LBW: obesity literature' },
-    { name: 'Fentanyl', scalar: 'Adult LBW', kind: 'lbw',
+    { name: 'Fentanyl', scalar: 'LBW', kind: 'lbw',
       variants: [
         { label: 'Adult GA · minor surgery', coefficient: 'IV initial · 1–2 μg/kg', value: amount(1, 2, r.lbw, 'μg') },
         { label: 'Adult GA · major surgery', coefficient: 'IV initial · 2–4 μg/kg', value: amount(2, 4, r.lbw, 'μg') },

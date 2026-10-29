@@ -8,7 +8,7 @@ const rows = doseRows(male);
 assert.equal(rows.length, 8);
 assert.deepEqual(rows[1].variants.map(r => r.value), ['158–197 mg', '79–118 mg', '39–118 mg', '79–158 mg']);
 assert.deepEqual(rows[2].variants.map(r => r.value), ['79–158 μg', '158–316 μg', '55–118 μg', '2–3 μg/kg']);
-assert.equal(rows[2].name, 'Fentanyl'); assert.equal(rows[2].scalar, 'Adult LBW');
+assert.equal(rows[2].name, 'Fentanyl'); assert.equal(rows[2].scalar, 'LBW');
 assert.match(rows[2].variants[0].coefficient, /IV initial · 1–2 μg\/kg/);
 assert.match(rows[2].variants[1].coefficient, /IV initial · 2–4 μg\/kg/);
 assert.match(rows[2].variants[2].coefficient, /IM \/ IV · 0.7–1.5 μg\/kg/);

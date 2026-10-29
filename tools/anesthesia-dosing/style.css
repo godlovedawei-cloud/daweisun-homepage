@@ -87,7 +87,9 @@ footer a { display:inline-flex; align-items:center; min-height:44px; }
 .reference > summary::after, .drug-detail > summary::after { content:'+'; font-weight:400; color:var(--accent); }
 .reference[open] > summary::after, .drug-detail[open] > summary::after { content:'−'; }
 .reference-content { padding-block:10px; }
-.drug-detail { margin-top:16px; border-top:1px solid var(--line); padding-top:6px; }
+.drug-detail { margin:0; }
+.drug-detail-row > td { padding:0 8px; }
+.drug-detail > summary { max-width:calc(100vw - 92px); }
 .basis { display:block; color:var(--muted); font-size:12px; font-weight:400; margin-top:5px; }
 @media (min-width:650px) {
  .reference { padding-inline:26px; }
