@@ -1,5 +1,5 @@
 // The build script derives this version from every offline asset and this worker.
-const CACHE_VERSION = '521adb1ff166efb8';
+const CACHE_VERSION = '763c67a89c0d3605';
 const PREFIX = 'daweisun-pediatric-anesthesia-';
 const CACHE = PREFIX + CACHE_VERSION;
 const FILES = ['./', './index.html', './app.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];

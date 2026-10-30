@@ -132,7 +132,9 @@
   .offline-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:10px 0 0; }
   .offline-bar button { min-height:36px; }
   .patient-tools :is(input,select,button):focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
-  .standalone-note summary { padding:12px 14px; font-size:12px; font-weight:700; }
+  .standalone-note > summary { padding:12px 14px; font-size:12px; font-weight:700; }
+  .standalone-note > summary::after { content:" ⌄"; color:var(--blue); }
+  .standalone-note[open] > summary::after { content:" ⌃"; }
 
   .formula-body { padding:0 14px 12px; font-size:11px; line-height:1.5; color:var(--muted); }
   .formula-body code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:10.5px; color:#243b53; background:#eef3f8; padding:2px 5px; border-radius:5px; }
@@ -157,6 +159,18 @@
   }
   .metric .m-label { font-size:11px; color:var(--muted); font-weight:700; }
   .metric .m-value { font-size:22px; font-weight:850; margin-top:5px; letter-spacing:-.02em; }
+  .reference-scroll { overflow-x:auto; overscroll-behavior-x:contain; }
+  .reference-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .reference-table th, .reference-table td { text-align:left; padding:8px 6px; border-bottom:1px solid var(--line); }
+  .reference-table th { color:var(--text); }
+  #vitalReferenceTable { font-size:11px; }
+  #vitalReferenceTable th, #vitalReferenceTable td { padding:8px 3px; }
+  .stanford-body { padding:0 12px 12px; }
+  .stanford-body .metric { min-width:0; padding:10px; }
+  .stanford-body .m-value { font-size:20px; }
+  #vitalReferenceTable td { white-space:nowrap; }
+  .reference-note { font-size:11px; line-height:1.5; color:var(--muted); margin:10px 0 0; }
+  .metric .m-value.text-value { font-size:18px; }
   #rrReference table { width:100%; border-collapse:collapse; font-size:11px; }
   #rrReference th, #rrReference td { text-align:left; padding:6px 3px; border-bottom:1px solid var(--line); }
   #rrReference td:last-child { white-space:nowrap; }
@@ -320,7 +334,13 @@
     <section id="fluids">
       <div class="section-head"><div><h2>Fluids & Blood</h2><div class="kicker">Weight-based calculations</div></div><span class="pill calc">AUTO</span></div>
       <div class="card">
-        <details class="item-note"><summary class="row"><div><div class="label">Maintenance fluid</div><div class="sub">Classic 4-2-1 reference</div></div><div class="value blue" id="maint">—</div></summary><div class="formula-body"><code>≤10 kg: 4 mL/kg/hr</code><br><code>10–20 kg: 40 + 2×(kg−10)</code><br><code>&gt;20 kg: 60 + 1×(kg−20)</code></div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Maintenance fluid</div><div class="sub">4-2-1 · cc/hr = mL/hr</div></div><div class="value blue" id="maint">—</div></summary><div class="formula-body">
+          <p><strong>1 cc = 1 mL.</strong> The hourly rates are equivalent.</p>
+          <code>First 10 kg: 4 cc/kg/hr</code><br><code>Next 10 kg: 2 cc/kg/hr</code><br><code>Above 20 kg: 1 cc/kg/hr</code>
+          <div id="maintenanceReference"></div>
+          <p>18 kg: <code>10×4 + 8×2 = 56 cc/hr</code><br>35 kg: <code>10×4 + 10×2 + 15×1 = 75 cc/hr</code></p>
+          <p class="reference-note">This estimates basal maintenance needs, not a fixed intraoperative order. Choose isotonic fluid, consider a balanced crystalloid per local policy, and individualize for surgical losses, perfusion, urine output and comorbidities. Do not automatically replace a full fasting deficit. Neonates and young infants may need glucose support and monitoring. <a href="https://www.openanesthesia.org/keywords/perioperative-fluid-administration-in-children/" target="_blank" rel="noopener">Fluid reference</a>.</p>
+        </div></details>
 
         <details class="item-note"><summary class="row"><div><div class="label">Fluid bolus shortcuts</div><div class="sub">Display only; indication determines actual bolus</div></div><div class="value" id="bolus">—</div></summary><div class="formula-body"><code>10 mL/kg = 10 × weight</code><br><code>20 mL/kg = 20 × weight</code></div></details>
 
@@ -332,14 +352,36 @@
 
     <section id="vitals">
       <div class="section-head"><div><h2>Awake / Resting Vital Signs</h2><div class="kicker">Age-specific reference ranges; not anesthetized targets</div></div><span class="pill lookup">LOOKUP</span></div>
+      <div class="card">
+        <details class="item-note standalone-note" id="stanfordReference">
+          <summary>Stanford reference values · HR / RR / SBP / DBP</summary>
+          <div class="stanford-body">
       <div class="two-col">
         <div class="metric"><div class="m-label">Heart rate</div><div class="m-value" id="hr">—</div><div class="m-sub">beats/min</div></div>
         <div class="metric"><div class="m-label">Respiratory rate</div><div class="m-value" id="rr">—</div><div class="m-sub">breaths/min</div></div>
-        <div class="metric"><div class="m-label">Blood pressure</div><div class="m-value" id="bp">—</div><div class="m-sub">SBP / DBP mmHg</div></div>
-        <div class="metric"><div class="m-label">MAP reference</div><div class="m-value" id="map">—</div><div class="m-sub">mmHg</div></div>
+        <div class="metric"><div class="m-label">SBP reference</div><div class="m-value" id="sbp">—</div><div class="m-sub">mmHg · systolic</div></div>
+        <div class="metric"><div class="m-label">DBP reference</div><div class="m-value" id="dbp">—</div><div class="m-sub">mmHg · diastolic</div></div>
+      </div>
+      <p class="reference-note" id="vitalBandNote">Stanford reference ranges · compare with the patient's baseline.</p>
+        <details class="item-note standalone-note" id="vitalReference"><summary>HR / RR / SBP / DBP by age</summary><div class="formula-body">
+          <div class="reference-scroll" tabindex="0" role="region" aria-label="Pediatric vital signs by age"><table class="reference-table" id="vitalReferenceTable"></table></div>
+          <p class="reference-note">Adapted from the <a href="https://www.stanfordchildrens.org/content/dam/sch/content-public/pdf/trauma-badge-buddy-stanford-childrens.pdf" target="_blank" rel="noopener">Stanford badge card (revised 2019)</a>. The PDF's final age label is incomplete; ≥16 yr follows the supplied age grouping. For automated lookup, 6 months starts the 6–&lt;12 mo band and 12 months starts the 1–3 yr band. These are resting references, not anesthetic targets; consider sleep, anxiety, fever and baseline. Newborn day/week ranges cannot be chosen from whole months alone.</p>
+        </div></details>
+          </div>
+        </details>
       </div>
       <div class="card" style="margin-top:8px">
         <details class="item-note"><summary class="row"><div><div class="label">Hypotension threshold</div><div class="sub">PALS-style systolic threshold</div></div><div class="value red" id="hypo">—</div></summary><div class="formula-body" id="hypoFormula">—</div></details>
+      </div>
+      <div class="card" style="margin-top:8px">
+        <details class="item-note standalone-note"><summary>Oxygenation, CO₂, temperature &amp; monitoring</summary><div class="formula-body">
+          <div class="row"><div><div class="label">SpO₂</div><div class="sub">Healthy child; individualize for disease and baseline</div></div><div class="value">≥95%</div></div>
+          <div class="row"><div><div class="label">EtCO₂</div><div class="sub">Typical reference; adjust for physiology and surgery</div></div><div class="value">35–45 mmHg</div></div>
+          <div class="row"><div><div class="label">Temperature</div><div class="sub">Stanford badge reference</div></div><div class="value">36.5–38°C</div></div>
+          <div class="row"><div><div class="label">Core temperature</div><div class="sub">General lower limit; newborn normothermia 36.5–37.5°C</div></div><div class="value">≥36°C</div></div>
+          <p>Reassess oxygenation or ventilation changes promptly; consider airway/tube, ventilation, oxygen supply and circulation. Use age-appropriate warming, warmed fluids and temperature monitoring.</p>
+          <p class="reference-note">ASA: determine and evaluate HR/BP at least every 5 minutes, display ECG continuously, and monitor expired CO₂ continuously with an ETT/SGA as specified in the standard. Sources: <a href="https://www.asahq.org/standards-and-practice-parameters/standards-for-basic-anesthetic-monitoring" target="_blank" rel="noopener">ASA</a> · <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12793998/" target="_blank" rel="noopener">EtCO₂ reference (children &gt;3 yr)</a> · <a href="https://onlinelibrary.wiley.com/doi/10.1111/pan.14366" target="_blank" rel="noopener">Pediatric ventilation review</a> · <a href="https://www.rch.org.au/rchcpg/hospital_clinical_guideline_index/Temperature_Management/" target="_blank" rel="noopener">Temperature ranges</a>.</p>
+        </div></details>
       </div>
     </section>
 
@@ -528,14 +570,24 @@
     return bands.find(b=>w<b.u)||null;
   }
 
+  // Stanford badge-card values, revised 2019. Its final age label is incomplete;
+  // the >=16-year mapping follows the owner's supplied grouping.
+  const VITAL_REFERENCE_BANDS=[
+    {name:'0–7 d',beforeMonths:null,hr:'95–160',rr:'40–60',sbp:'80–95',dbp:'50–65'},
+    {name:'1–3 wk',beforeMonths:null,hr:'105–170',rr:'30–60',sbp:'85–105',dbp:'50–70'},
+    {name:'1–<6 mo',beforeMonths:6,hr:'120–170',rr:'24–40',sbp:'85–105',dbp:'40–60'},
+    {name:'6–<12 mo',beforeMonths:12,hr:'110–150',rr:'24–40',sbp:'85–100',dbp:'40–60'},
+    {name:'1–3 yr',beforeMonths:48,hr:'90–150',rr:'22–30',sbp:'85–105',dbp:'40–60'},
+    {name:'4–5 yr',beforeMonths:72,hr:'80–130',rr:'20–25',sbp:'90–105',dbp:'45–65'},
+    {name:'6–8 yr',beforeMonths:108,hr:'70–115',rr:'18–25',sbp:'90–110',dbp:'50–70'},
+    {name:'9–11 yr',beforeMonths:144,hr:'65–110',rr:'16–25',sbp:'95–115',dbp:'60–75'},
+    {name:'12–15 yr',beforeMonths:192,hr:'60–100',rr:'14–20',sbp:'100–120',dbp:'60–80'},
+    {name:'≥16 yr*',beforeMonths:Infinity,hr:'55–100',rr:'14–20',sbp:'110–120',dbp:'65–80'}
+  ];
   function vitalBand(months){
-    if(months<1)return{name:'0–28 d',hr:'104–162',rr:'31–60',bp:'60–80 / 30–53',map:'≥40'};
-    if(months<4)return{name:'1–3 mo',hr:'104–162',rr:'31–60',bp:'73–105 / 36–68',map:'≥48'};
-    if(months<12)return{name:'4–11 mo',hr:'109–159',rr:'29–53',bp:'82–105 / 46–68',map:'58–80'};
-    if(months<48)return{name:'1–3 yr',hr:'89–139',rr:'25–39',bp:'85–109 / 37–67',map:'53–81'};
-    if(months<84)return{name:'4–6 yr',hr:'71–128',rr:'17–31',bp:'91–114 / 50–74',map:'63–87'};
-    if(months<144)return{name:'7–11 yr',hr:'60–114',rr:'15–28',bp:'96–121 / 57–80',map:'70–94'};
-    return{name:'12+ yr',hr:'50–104',rr:'12–25',bp:'105–136 / 62–87',map:'76–103'};
+    if(months<1)return{name:'<1 mo · see day/week table',hr:'See table',rr:'See table',sbp:'See table',dbp:'See table',bp:'See table',map:null};
+    const band=VITAL_REFERENCE_BANDS.find(b=>b.beforeMonths!==null && months<b.beforeMonths);
+    return{...band,bp:`${band.sbp} / ${band.dbp}`,map:null};
   }
 
   // Owner-supplied approximate starting respiratory rates; independent of Ti/Vt bands.
@@ -786,13 +838,16 @@
     $('cvcFormula').innerHTML='Single-engine age/weight reference; confirm vein diameter, lumens, flow, site and institutional practice.';
     $('ioFormula').innerHTML='Device-specific needle selection remains authoritative.';
 
-    const f=r.fluids;$('maint').textContent=`${n(f.maintenanceMlHr,1)} mL/hr`;$('bolus').innerHTML=`${n(f.bolus10Ml,0)} / ${n(f.bolus20Ml,0)} mL<small>10 / 20 mL·kg⁻¹</small>`;$('ebv').textContent=range(f.ebvMl[0],f.ebvMl[1],'mL');$('ebvBand').textContent=f.ebv.label;
+    const f=r.fluids;$('maint').innerHTML=`${n(f.maintenanceMlHr,1)} cc/hr<small>= ${n(f.maintenanceMlHr,1)} mL/hr</small>`;$('bolus').innerHTML=`${n(f.bolus10Ml,0)} / ${n(f.bolus20Ml,0)} mL<small>10 / 20 mL·kg⁻¹</small>`;$('ebv').textContent=range(f.ebvMl[0],f.ebvMl[1],'mL');$('ebvBand').textContent=f.ebv.label;
     if(f.mabl){$('mabl').textContent=range(f.mabl.low,f.mabl.high,'mL');$('mablFormula').innerHTML=`<code>MABL = EBV × (Hctᵢ − Hctₜ)/Hctᵢ</code><br>Fraction ${n(f.mabl.factor,3)}; result <b>${range(f.mabl.low,f.mabl.high,'mL')}</b>.`;}
     else if(r.hct.mablError){$('mabl').textContent='Check Hct';$('mablFormula').innerHTML=`<code>MABL = EBV × (Hctᵢ − Hctₜ)/Hctᵢ</code><br><b>${r.hct.mablError}</b> Other calculator sections remain active.`;}
     else{$('mabl').textContent='Enter Hct';$('mablFormula').innerHTML='<code>MABL = EBV × (Hctᵢ − Hctₜ)/Hctᵢ</code>. Enter initial and target Hct.';}
 
-    const vi=r.vitals;$('hr').textContent=vi.band.hr;$('rr').textContent=vi.band.rr;$('bp').textContent=vi.band.bp;$('map').textContent=vi.band.map;$('hypo').textContent=`<${n(vi.hypotension,0)} mmHg`;
-    $('hypoFormula').innerHTML=p.totalMonths<1?'Neonate: SBP <60 mmHg.':p.years<1?'Infant: SBP <70 mmHg.':p.years<=10?`<code>70 + 2 × age</code> = <b>${n(vi.hypotension,0)} mmHg</b>.`:'Age >10 yr: SBP <90 mmHg.';
+    const vi=r.vitals;
+    for(const id of ['hr','rr','sbp','dbp']){$(id).textContent=vi.band[id];$(id).classList.toggle('text-value',p.totalMonths<1);}
+    $('vitalBandNote').textContent=p.totalMonths<1?'Newborn age in days/weeks is needed: use the table below; whole months cannot select a neonatal row.':`${vi.band.name} · resting references; compare with baseline.`;
+    $('hypo').textContent=`<${n(vi.hypotension,0)} mmHg`;
+    $('hypoFormula').innerHTML=(p.totalMonths<1?'Neonate: SBP <60 mmHg.':p.years<1?'Infant: SBP <70 mmHg.':p.years<=10?`<code>70 + 2 × age</code> = <b>${n(vi.hypotension,0)} mmHg</b>.`:'Age >10 yr: SBP <90 mmHg.')+HYPOTENSION_REFERENCE;
 
     const d=r.drugs,w=p.w;
     let html=groupTitle('Induction / sedation');
@@ -916,6 +971,10 @@
       ["Malignant hyperthermia", "Ryanodex", "250 mg vial • +5 mL sterile water"]
     ]
   };
+  const HYPOTENSION_REFERENCE=`<table class="reference-table"><thead><tr><th>Age</th><th>SBP hypotension</th></tr></thead><tbody>
+    <tr><td>Term newborn (0–28 d)</td><td>&lt;60 mmHg</td></tr><tr><td>Infant (1–&lt;12 mo)</td><td>&lt;70 mmHg</td></tr>
+    <tr><td>1–10 yr</td><td>&lt;70 + 2×age mmHg</td></tr><tr><td>&gt;10 yr</td><td>&lt;90 mmHg</td></tr></tbody></table>
+    <p class="reference-note">These are resuscitation thresholds, not anesthetic targets. Assess perfusion and the patient's baseline: sustained BP more than 20% below baseline can be concerning. <a href="https://www.childrensmercy.org/siteassets/media-documents-for-depts-section/documents-for-health-care-providers/block-clinical-practice-guidelines/mobileview/anaphylaxis-normal-blood-pressure-by-age.pdf" target="_blank" rel="noopener">AHA/PEARS-derived cutoffs</a> · <a href="https://pedsanesthesia.org/checklists/" target="_blank" rel="noopener">SPA hypotension checklist</a>.</p>`;
   const referenceDetails={
     ettFormula:'Age 2–<14 yr: <code>cuffed ETT ID = age/4 + 3.5</code>; prepare adjacent available sizes. Infants use age/weight guidance. Newborns use the neonatal weight guide. Age ≥14 yr: adult/adolescent sizing; verify locally.',
     depthFormula:'Child reference: <code>age/2 + 12</code> cm; cross-checks include <code>3 × calculated ID</code> and <code>weight/5 + 12</code>. Newborn lip depth: <code>weight (kg) + 6</code> cm. Corrected-gestation guidance and clinical confirmation take priority.',
@@ -924,13 +983,15 @@
     alineFormula:'Age/weight reference only; ultrasound artery diameter takes priority.',
     cvcFormula:'Confirm vein diameter, lumens, flow, site and institutional practice.',
     ioFormula:'Device-specific needle selection remains authoritative.',
-    hypoFormula:'Neonate: SBP <60 mmHg. Infant: SBP <70 mmHg. Age 1–10 yr: <code>70 + 2 × age</code> mmHg. Age >10 yr: SBP <90 mmHg.',
+    hypoFormula:HYPOTENSION_REFERENCE,
     mablFormula:'<code>MABL = EBV × (Hctᵢ − Hctₜ)/Hctᵢ</code>. Enter age, weight, initial and target Hct.'
   };
   const defaultLocalWarning=$('localWarning').innerHTML;
   function renderReference(){
     document.querySelectorAll('main .value[id], main .m-value[id]').forEach(el=>{el.textContent='—';});
     $('ebvBand').textContent='Age-specific mL/kg range';
+    $('vitalBandNote').textContent="Stanford reference ranges · compare with the patient's baseline.";
+    for(const id of ['hr','rr','sbp','dbp']) $(id).classList.remove('text-value');
     for(const [id,html] of Object.entries(referenceDetails)) $(id).innerHTML=html;
     for(const [id,rows] of Object.entries(REFERENCE_ROWS)){
       let group='',html='';
@@ -1032,8 +1093,10 @@
     hctInitialEl.value=raw.hctInitial??'';hctTargetEl.value=raw.hctTarget??'';
     confirmedWeightKey=null;return update();
   }
+  $('maintenanceReference').innerHTML='<table class="reference-table"><thead><tr><th>Weight</th><th>Maintenance</th></tr></thead><tbody>'+[5,10,15,20,25,30,40,50,60].map(w=>`<tr><td>${w} kg</td><td>${n(maintenance(w))} cc/hr = ${n(maintenance(w))} mL/hr</td></tr>`).join('')+'</tbody></table>';
+  $('vitalReferenceTable').innerHTML='<thead><tr><th>Age</th><th>HR<br>/min</th><th>RR<br>/min</th><th>SBP<br>mmHg</th><th>DBP<br>mmHg</th></tr></thead><tbody>'+VITAL_REFERENCE_BANDS.map(b=>`<tr><td>${b.name}</td><td>${b.hr}</td><td>${b.rr}</td><td>${b.sbp}</td><td>${b.dbp}</td></tr>`).join('')+'</tbody>';
   $('rrReference').innerHTML='<table><thead><tr><th>Age</th><th>Starting RR</th></tr></thead><tbody>'+INITIAL_RR_BANDS.map(band=>`<tr><td>${band.label}</td><td>${band.rr}/min</td></tr>`).join('')+'</tbody></table>';
-  window.PediatricAnesthesiaCalculator={calculate:calculatePatient,update,validate:validateInput,read:readRawInputs,load:loadPatient,runSelfTests,version:'6.1.1'};
+  window.PediatricAnesthesiaCalculator={calculate:calculatePatient,update,validate:validateInput,read:readRawInputs,load:loadPatient,runSelfTests,version:'6.2.0'};
   clearResultsState();
   if(new URLSearchParams(location.search).get('selftest')==='1'){
     const report=runSelfTests();const pre=document.createElement('pre');pre.id='selftestReport';pre.dataset.selftest=`${report.passed}/${report.total}`;pre.textContent=JSON.stringify(report,null,2);document.body.appendChild(pre);
