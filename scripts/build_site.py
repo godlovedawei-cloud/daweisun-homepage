@@ -157,7 +157,7 @@ def header(publications=False):
     links += f'<a href="{("/publications.html" if publications else "#publications")}"' + (' aria-current="page"' if publications else '') + '>Publications</a>'
     links += f'<a href="{home}#grants">Grants &amp; Presentations</a>'
     links += '''<details class="tools-menu"><summary>Tools <span aria-hidden="true">▾</span></summary>
-<div class="tools-dropdown"><a href="/tools/anesthesia-dosing/">Anesthesia Dose Quick Reference</a></div></details>'''
+<div class="tools-dropdown"><a href="/tools/anesthesia-dosing/">Anesthesia Dose Quick Reference</a><a href="/tools/pediatric-anesthesia/">Pediatric Anesthesia Quick Reference · Test</a></div></details>'''
     return f'''<a class="skip" href="#main">Skip to content</a>
 <header class="site-header"><div class="wrap header-inner">
 <a class="brand" href="/">Dawei Sun<span class="brand-degree">, M.D., Ph.D.</span></a>
