@@ -7,7 +7,7 @@ English physician academic homepage with a reverse chronological education and e
 - Hosting: GitHub Pages, root of `main`; DNS remains unchanged.
 - Pages: `index.html` and `publications.html`.
 - Public CV: `assets/Dawei-Sun-CV.pdf`. Original CVs and clinical logs remain outside the repository.
-- Styles: `assets/site.css`; academic pages use a small navigation script for dismissing the Tools dropdown. The anesthesia tool uses local JavaScript and an isolated offline worker. No analytics, external fonts, or backend.
+- Styles: `assets/site.css`; academic pages use a small navigation script for dismissing the Tools dropdown. The anesthesia tool uses local JavaScript and an isolated offline worker. Private visit analytics use a dedicated Cloudflare Worker; no external fonts. Tool patient records and inputs remain local.
 
 ## Preview and build
 
@@ -115,3 +115,20 @@ The sticky quick navigation now has two explicit rows with Drugs first, followed
 Sevoflurane is the first drug entry, with its age table and MAC concepts collapsed under the item name. [DailyMed Table 9](https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=0ca6da3a-6a18-400d-8c49-08a5534b025f) supplies the in-oxygen reference values: full-term newborn 3.3%, 1–<6 months 3.0%, 6 months–<3 years 2.8%, and 3–12 years 2.5%; the expanded reference contains only these four pediatric rows, with 1/0.7/1.3-MAC columns and a label link in each row. The 0.7 and 1.3 columns are arithmetic conversions, rounded as supplied: 2.3/4.3%, 2.1/3.9%, 2.0/3.6%, and 1.75/3.25%. Adult rows and the adult worked example are omitted. The automatic label lookup stops above 12 years (144 months); no adolescent value is extrapolated. Premature-infant MAC is undetermined. The age reference remains available when an outlier weight suppresses routine IV calculations. The existing calculation engine's outputs are otherwise unchanged.
 
 The 0.7–1.3 age-adjusted MAC range is described as the adult B-Unaware ETAG alarm protocol, based on its [primary methods report](https://pmc.ncbi.nlm.nih.gov/articles/PMC3683547/). It is not presented as a validated universal pediatric maintenance range or a guarantee against awareness. The ~1.3-MAC MAC95 statement is explicitly an approximate movement endpoint; the [supporting primary discussion](https://pubs.asahq.org/anesthesiology/article-pdf/90/2/406/396157/0000542-199902000-00013.pdf) specifically discusses isoflurane. The [MAC-awake study](https://pubmed.ncbi.nlm.nih.gov/8214700/) concerns adult responsiveness to command, not an amnesia threshold. The label's pediatric N2O datum applies to 1–<3 years with 60% N2O; no generic “halve the dose” rule is applied. Run `node scripts/test_pediatric_sevo.mjs` with the other pediatric checks after changing this reference.
+
+
+## Private visit analytics — October 30, 2026
+
+All four pages send pageviews, approximate engagement/scroll and selected link clicks to the independent `daweisun-visit-log` Cloudflare Worker. Records expire after 90 days. The private dashboard displays Beijing time and groups records by IP plus a random browser label (`daweisun.analytics.visitor.v1`). These fields cannot identify a particular person. No patient records, form values or calculation results are read or transmitted. Paths omit queries/fragments, referrers retain only the origin, and tracked links omit queries/fragments. Offline events are dropped, not queued or replayed. Fetches time out after 30 seconds with no retries.
+
+Dashboard: https://daweisun-visit-log.yanxiawei-visit-log.workers.dev/admin
+
+Enter the separate administrator token in the dashboard; it stays in page memory and is sent only through the Authorization header. No token in URLs, browser storage, source code or Git. Refresh retrieves the latest 500 events; “更早记录” loads the next batch. Counts and time ranges apply only to the displayed batch, not all retained history. KV is eventually consistent, so a newly collected event may take time to appear.
+
+Worker endpoints: `POST /collect`, `GET /admin`, authenticated `GET /api/visits?cursor=...`, and public `GET /health`. Collection accepts only the two production site origins. IP comes only from Cloudflare's connecting-IP header. Backend allowlists event fields, paths and click categories. Reverse-timestamp KV keys select newest events first; reads are batched in groups of 100.
+
+Deploy from `worker/` using Wrangler. Create a dedicated KV namespace, set its ID in `wrangler.toml`, and supply `ADMIN_TOKEN` with `wrangler secret put ADMIN_TOKEN` from an environment variable or ignored local secret file. Never reuse Yanxiawei's token or namespace. Deploy and check the Worker before publishing the frontend. Local previews do not transmit analytics.
+
+Run `node scripts/test_analytics.mjs` and `python3 scripts/build_site.py --pages-only`. The latter preserves the public CV. Both offline workers include the shared analytics asset in their atomic caches; editing it updates both cache versions. Normal site use and calculations remain available when collection is blocked or unavailable.
+
+Administrator token backup on the owner's Mac: `~/.config/daweisun-visit-log/admin-token.txt` (owner-only permissions). This file is outside the website repository.

@@ -147,6 +147,7 @@ def head(title, description, path='/'):
 <meta name="twitter:image" content="https://daweisun.com/assets/portrait.jpg">
 <link rel="stylesheet" href="/assets/site.css">
 <script src="/assets/navigation.js" defer></script>
+<script src="/assets/analytics.js" defer></script>
 </head>'''
 
 

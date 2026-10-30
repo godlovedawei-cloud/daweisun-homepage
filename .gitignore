@@ -7,3 +7,12 @@ build/
 .playwright-mcp/
 .playwright-cli/
 tmp/
+
+# Local credentials and Worker caches
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+.wrangler/
+worker/node_modules/
+worker/.wrangler/

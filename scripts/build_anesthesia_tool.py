@@ -15,6 +15,7 @@ for directory, names in assets.items():
     source = worker.read_text()
     normalized = re.sub(r"const CACHE_VERSION = '[^']+';", "const CACHE_VERSION = 'BUILD_VERSION';", source)
     digest = hashlib.sha256(normalized.encode())
+    digest.update((ROOT.parent / 'assets/analytics.js').read_bytes())
     for name in names:
         digest.update(name.encode())
         digest.update((ROOT / directory / name).read_bytes())
