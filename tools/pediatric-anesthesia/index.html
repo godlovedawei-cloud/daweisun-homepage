@@ -6,7 +6,9 @@
 <meta name="theme-color" content="#f4f7fb" />
 <title>Pediatric Anesthesia Quick Reference · Test version | Dawei Sun</title>
 <meta name="description" content="Pediatric anesthesia reference prototype. Unverified data. For testing only; not for clinical use." />
-<link rel="icon" href="data:," />
+<link rel="icon" href="./icon-192.png" type="image/png" />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="apple-touch-icon" href="./apple-touch-icon.png" />
 <link rel="canonical" href="https://daweisun.com/tools/pediatric-anesthesia/" />
 <style>
   :root {
@@ -109,11 +111,30 @@
   .value.red { color:var(--red); }
   .value.amber { color:var(--amber); }
 
-  details.formula { border-top:1px dashed #e4e9ef; background:#fbfcfe; }
-  details.formula summary { list-style:none; cursor:pointer; padding:9px 14px; color:#536070; font-size:11px; font-weight:750; }
-  details.formula summary::-webkit-details-marker { display:none; }
-  details.formula summary::before { content:"ⓘ "; color:var(--blue); }
-  .formula-body { padding:0 14px 12px; font-size:11px; line-height:1.5; color:#536070; }
+  details.item-note { border-top:1px solid #edf1f5; }
+  details.item-note:first-child { border-top:0; }
+  details.item-note > summary { list-style:none; cursor:pointer; }
+  details.item-note > summary::-webkit-details-marker { display:none; }
+  details.item-note > summary::marker { content:""; }
+  details.item-note > summary .label::after, details.metric > summary .m-label::after { content:" ⌄"; color:var(--blue); }
+  details.item-note[open] > summary .label::after, details.metric[open] > summary .m-label::after { content:" ⌃"; }
+  details.item-note > summary:focus-visible { outline:2px solid var(--blue); outline-offset:-3px; }
+  details.metric .formula-body { padding:10px 0 0; }
+  .card > details.item-note > summary { border-top:0; }
+  .patient-tools { margin:14px 0 12px; }
+  .patient-tools label { display:block; font-size:11px; color:var(--muted); font-weight:700; margin:8px 0 5px; }
+  .patient-tools input, .patient-tools select { width:100%; min-width:0; min-height:44px; padding:9px 10px; border:1px solid var(--line); border-radius:11px; color:var(--text); background:var(--card); font:inherit; font-size:13px; }
+  .patient-select-row { display:flex; gap:8px; align-items:center; }
+  .patient-select-row select { flex:1; width:0; }
+  .patient-select-row button { flex:0 0 auto; min-height:44px; }
+  .storage-note, .offline-status { font-size:11px; color:var(--muted); line-height:1.4; }
+  .storage-note { margin:7px 0 0; }
+  .offline-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:10px 0 0; }
+  .offline-bar button { min-height:36px; }
+  .patient-tools :is(input,select,button):focus-visible { outline:2px solid var(--blue); outline-offset:2px; }
+  .standalone-note summary { padding:12px 14px; font-size:12px; font-weight:700; }
+
+  .formula-body { padding:0 14px 12px; font-size:11px; line-height:1.5; color:var(--muted); }
   .formula-body code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:10.5px; color:#243b53; background:#eef3f8; padding:2px 5px; border-radius:5px; }
   .formula-body a { color:var(--blue); text-decoration:none; }
 
@@ -147,7 +168,7 @@
   .footer { text-align:center; color:#98a2b3; font-size:10px; line-height:1.5; padding: 10px 20px 0; }
 
   .hidden { display:none !important; }
-  body.no-patient .jump-wrap, body.no-patient main { display:none; }
+  [hidden] { display:none !important; }
   .field input.invalid { border-color: var(--red); box-shadow: 0 0 0 3px rgba(180,35,24,.10); }
   .validation { margin-top:10px; font-size:12px; color:var(--red); line-height:1.4; }
   .validation.hidden { display:none; }
@@ -170,7 +191,7 @@
     .field input,.btn,.jump { background:#111821; color:var(--text); border-color:#334155; }
     .jump-wrap { background:rgba(13,17,23,.93); border-color:#222c38; }
     .row { border-color:#252e3a; }
-    details.formula,.drug-group-title { background:#111821; border-color:#27313d; }
+    details.item-note,.drug-group-title { background:#111821; border-color:#27313d; }
     .formula-body code { background:#202a36; color:#dce6f2; }
     .notice { background:#251d11; border-color:#503a17; color:#f1c37a; }
     .refs details { background:#151b23; }
@@ -192,7 +213,19 @@
 
     <div class="notice"><strong>Unverified data.</strong> For testing only; not for clinical use.</div>
 
+    <div class="offline-bar" role="status">
+      <span class="offline-status" id="offline-status">Preparing offline…</span>
+      <button class="btn" id="update-app" type="button" hidden>Update</button>
+      <button class="btn" id="retry-offline" type="button" hidden>Retry offline download</button>
+    </div>
     <div class="patient-card">
+      <div class="patient-tools">
+        <label for="patient-select">Recent patients · last 5</label>
+        <div class="patient-select-row"><select id="patient-select" aria-label="Recent patients"></select><button class="btn primary" id="new-patient" type="button">+ New</button></div>
+        <label for="patient-label">Case label · initials only (optional)</label>
+        <input id="patient-label" type="text" maxlength="24" autocomplete="off" placeholder="Optional case label" />
+        <p class="storage-note" id="storage-status" role="status">Saved on this device only · last 5 patients</p>
+      </div>
       <div class="input-grid">
         <div class="field">
           <label for="ageY">Age</label>
@@ -211,7 +244,6 @@
         <div class="patient-summary"><span id="patientSummary">Enter age and weight</span> <span class="pill lookup" id="liveBadge">WAITING</span></div>
         <div class="mini-actions">
           <button class="btn" id="resetBtn" type="button">Reset</button>
-          <button class="btn primary" id="formulaBtn" type="button">Show formulas</button>
         </div>
       </div>
       <div id="validationMessage" class="validation hidden"></div>
@@ -247,72 +279,51 @@
     <section id="airway">
       <div class="section-head"><div><h2>Airway</h2><div class="kicker">Calculated + age/weight lookup</div></div><span class="pill calc">AUTO</span></div>
       <div class="card">
-        <div class="row"><div><div class="label">ETT size</div><div class="sub" id="ettSub">Primary estimate + backups</div></div><div class="value blue" id="ettCuffed">—</div></div>
-        <details class="formula"><summary>Formula / rule</summary><div class="formula-body" id="ettFormula">—</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">ETT size</div><div class="sub" id="ettSub">Primary estimate + backups</div></div><div class="value blue" id="ettCuffed">—</div></summary><div class="formula-body" id="ettFormula">—</div></details>
 
-        <div class="row"><div><div class="label">ETT depth at lip / teeth</div><div class="sub">Use as starting estimate; verify position clinically</div></div><div class="value" id="ettDepth">—</div></div>
-        <details class="formula"><summary>Formula / cross-checks</summary><div class="formula-body" id="depthFormula">—</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">ETT depth at lip / teeth</div><div class="sub">Use as starting estimate; verify position clinically</div></div><div class="value" id="ettDepth">—</div></summary><div class="formula-body" id="depthFormula">—</div></details>
 
-        <div class="row"><div><div class="label">Weight-guide cross-check</div><div class="sub">CHBC pediatric invasive ventilation guide</div></div><div class="value" id="weightEtt">—</div></div>
-        <details class="formula"><summary>Lookup source</summary><div class="formula-body">Weight-banded cuffed ETT and depth guide from Child Health BC. If age- and weight-based estimates differ, use clinical judgment and have adjacent sizes available.</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Weight-guide cross-check</div><div class="sub">CHBC pediatric invasive ventilation guide</div></div><div class="value" id="weightEtt">—</div></summary><div class="formula-body">Weight-banded cuffed ETT and depth guide from Child Health BC. If age- and weight-based estimates differ, use clinical judgment and have adjacent sizes available.</div></details>
 
-        <div class="row"><div><div class="label">LMA size</div><div class="sub">Teleflex LMA weight band</div></div><div class="value green" id="lma">—</div></div>
-        <details class="formula"><summary>Weight bands</summary><div class="formula-body">≤5 kg → #1; 5–10 → #1.5; 10–20 → #2; 20–30 → #2.5; 30–50 → #3; 50–70 → #4; 70–100 → #5; &gt;100 → #6.</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">LMA size</div><div class="sub">Teleflex LMA weight band</div></div><div class="value green" id="lma">—</div></summary><div class="formula-body">≤5 kg → #1; 5–10 → #1.5; 10–20 → #2; 20–30 → #2.5; 30–50 → #3; 50–70 → #4; 70–100 → #5; &gt;100 → #6.</div></details>
 
-        <div class="row"><div><div class="label">Laryngoscope blade</div><div class="sub">Recommendation, not a mathematical formula</div></div><div class="value" id="blade">—</div></div>
-        <details class="formula"><summary>Selection note</summary><div class="formula-body">Straight blades are commonly preferred in neonates/infants; curved blades are commonly used in older children. Exact blade choice depends on anatomy, video-laryngoscope system and operator preference.</div></details>
-
-        <div class="row"><div><div class="label">Face mask</div><div class="sub">Choose by anatomical fit</div></div><div class="value" id="mask">—</div></div>
-        <details class="formula"><summary>Fit rule</summary><div class="formula-body">Mask should cover the mouth and nose without covering the eyes. Manufacturer number varies, so the tool avoids a false universal numeric size.</div></details>
-
-        <div class="row"><div><div class="label">Inline suction catheter</div><div class="sub">Approximate from selected ETT</div></div><div class="value" id="suction">—</div></div>
-        <details class="formula"><summary>Rule</summary><div class="formula-body">Child Health BC table: ETT 3.0–3.5 → 6 Fr; 3.5–4.5 → 8 Fr; 5.0–6.0 → 10 Fr; 6.0–7.0 → 12 Fr.</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Laryngoscope blade</div><div class="sub">Recommendation, not a mathematical formula</div></div><div class="value" id="blade">—</div></summary><div class="formula-body">Straight blades are commonly preferred in neonates/infants; curved blades are commonly used in older children. Exact blade choice depends on anatomy, video-laryngoscope system and operator preference.</div></details>
       </div>
     </section>
 
     <section id="vent">
       <div class="section-head"><div><h2>Ventilation</h2><div class="kicker">Initial reference settings</div></div><span class="pill ref">REFERENCE</span></div>
       <div class="two-col">
-        <div class="metric"><div class="m-label">Tidal volume</div><div class="m-value" id="vt">—</div><div class="m-sub">mL • calculated from weight</div></div>
+        <details class="metric item-note"><summary><div class="m-label">Tidal volume</div><div class="m-value" id="vt">—</div><div class="m-sub">mL • calculated from weight</div></summary><div class="formula-body" id="ventFormula">Enter age and weight for ventilation references.</div></details>
         <div class="metric"><div class="m-label">Initial RR</div><div class="m-value" id="ventRR">—</div><div class="m-sub">breaths/min</div></div>
         <div class="metric"><div class="m-label">Inspiratory time</div><div class="m-value" id="ti">—</div><div class="m-sub">seconds</div></div>
         <div class="metric"><div class="m-label">PEEP</div><div class="m-value">5–8</div><div class="m-sub">cm H₂O, initial reference</div></div>
       </div>
       <div class="alert-card amber" style="margin-top:8px">For ventilator tidal volume, use the lesser of predicted/ideal body weight and actual body weight when applicable. Adjust to gas exchange, mechanics and surgical context.</div>
-      <div class="card">
-        <details class="formula"><summary>Ventilation formula / age table</summary><div class="formula-body" id="ventFormula">—</div></details>
-      </div>
+
     </section>
 
     <section id="vascular">
       <div class="section-head"><div><h2>Vascular Access</h2><div class="kicker">Age/weight-based preparation guide</div></div><span class="pill lookup">LOOKUP</span></div>
       <div class="alert-card amber">These are preparation references, not automatic device orders. For arterial/CVC placement, ultrasound vessel diameter and the clinical indication take priority over age or weight alone.</div>
       <div class="card">
-        <div class="row"><div><div class="label">Peripheral IV</div><div class="sub">Typical catheter sizes to have available</div></div><div class="value" id="piv">—</div></div>
-        <details class="formula"><summary>Age/weight lookup</summary><div class="formula-body" id="pivFormula">—</div></details>
-        <div class="row"><div><div class="label">Radial arterial catheter</div><div class="sub">Confirm artery diameter with ultrasound when feasible</div></div><div class="value" id="aline">—</div></div>
-        <details class="formula"><summary>Age/weight lookup</summary><div class="formula-body" id="alineFormula">—</div></details>
-        <div class="row"><div><div class="label">Non-tunneled CVC</div><div class="sub">French size reference; vessel-to-catheter ratio matters</div></div><div class="value" id="cvc">—</div></div>
-        <details class="formula"><summary>Age/weight lookup</summary><div class="formula-body" id="cvcFormula">—</div></details>
-        <div class="row"><div><div class="label">Intraosseous access</div><div class="sub">Emergency reference; device/manufacturer dependent</div></div><div class="value" id="io">—</div></div>
-        <details class="formula"><summary>Weight lookup</summary><div class="formula-body" id="ioFormula">—</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Peripheral IV</div><div class="sub">Typical catheter sizes to have available</div></div><div class="value" id="piv">—</div></summary><div class="formula-body" id="pivFormula">—</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Radial arterial catheter</div><div class="sub">Confirm artery diameter with ultrasound when feasible</div></div><div class="value" id="aline">—</div></summary><div class="formula-body" id="alineFormula">—</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Non-tunneled CVC</div><div class="sub">French size reference; vessel-to-catheter ratio matters</div></div><div class="value" id="cvc">—</div></summary><div class="formula-body" id="cvcFormula">—</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Intraosseous access</div><div class="sub">Emergency reference; device/manufacturer dependent</div></div><div class="value" id="io">—</div></summary><div class="formula-body" id="ioFormula">—</div></details>
       </div>
     </section>
 
     <section id="fluids">
       <div class="section-head"><div><h2>Fluids & Blood</h2><div class="kicker">Weight-based calculations</div></div><span class="pill calc">AUTO</span></div>
       <div class="card">
-        <div class="row"><div><div class="label">Maintenance fluid</div><div class="sub">Classic 4-2-1 reference</div></div><div class="value blue" id="maint">—</div></div>
-        <details class="formula"><summary>Formula</summary><div class="formula-body"><code>≤10 kg: 4 mL/kg/hr</code><br><code>10–20 kg: 40 + 2×(kg−10)</code><br><code>&gt;20 kg: 60 + 1×(kg−20)</code></div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Maintenance fluid</div><div class="sub">Classic 4-2-1 reference</div></div><div class="value blue" id="maint">—</div></summary><div class="formula-body"><code>≤10 kg: 4 mL/kg/hr</code><br><code>10–20 kg: 40 + 2×(kg−10)</code><br><code>&gt;20 kg: 60 + 1×(kg−20)</code></div></details>
 
-        <div class="row"><div><div class="label">Fluid bolus shortcuts</div><div class="sub">Display only; indication determines actual bolus</div></div><div class="value" id="bolus">—</div></div>
-        <details class="formula"><summary>Formula</summary><div class="formula-body"><code>10 mL/kg = 10 × weight</code><br><code>20 mL/kg = 20 × weight</code></div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Fluid bolus shortcuts</div><div class="sub">Display only; indication determines actual bolus</div></div><div class="value" id="bolus">—</div></summary><div class="formula-body"><code>10 mL/kg = 10 × weight</code><br><code>20 mL/kg = 20 × weight</code></div></details>
 
-        <div class="row"><div><div class="label">Estimated blood volume</div><div class="sub" id="ebvBand">Age-specific mL/kg range</div></div><div class="value" id="ebv">—</div></div>
-        <details class="formula"><summary>Formula / age bands</summary><div class="formula-body"><code>EBV = weight × blood volume (mL/kg)</code><br>Term newborn 80–90; infant &lt;1 yr 75–80; child 1–12 yr 70–75 mL/kg. Prematurity requires separate assessment.</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Estimated blood volume</div><div class="sub" id="ebvBand">Age-specific mL/kg range</div></div><div class="value" id="ebv">—</div></summary><div class="formula-body"><code>EBV = weight × blood volume (mL/kg)</code><br>Term newborn 80–90; infant &lt;1 yr 75–80; child 1–12 yr 70–75 mL/kg. Prematurity requires separate assessment.</div></details>
 
-        <div class="row"><div><div class="label">Maximum allowable blood loss</div><div class="sub">Requires initial + target Hct above</div></div><div class="value" id="mabl">Enter Hct</div></div>
-        <details class="formula"><summary>Formula</summary><div class="formula-body" id="mablFormula"><code>MABL = EBV × (Hctᵢ − Hctₜ) / Hctᵢ</code>. This is only one component of transfusion decision-making.</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Maximum allowable blood loss</div><div class="sub">Requires initial + target Hct above</div></div><div class="value" id="mabl">Enter Hct</div></summary><div class="formula-body" id="mablFormula"><code>MABL = EBV × (Hctᵢ − Hctₜ) / Hctᵢ</code>. This is only one component of transfusion decision-making.</div></details>
       </div>
     </section>
 
@@ -325,8 +336,7 @@
         <div class="metric"><div class="m-label">MAP reference</div><div class="m-value" id="map">—</div><div class="m-sub">mmHg</div></div>
       </div>
       <div class="card" style="margin-top:8px">
-        <div class="row"><div><div class="label">Hypotension threshold</div><div class="sub">PALS-style systolic threshold</div></div><div class="value red" id="hypo">—</div></div>
-        <details class="formula"><summary>Formula / threshold</summary><div class="formula-body" id="hypoFormula">—</div></details>
+        <details class="item-note"><summary class="row"><div><div class="label">Hypotension threshold</div><div class="sub">PALS-style systolic threshold</div></div><div class="value red" id="hypo">—</div></summary><div class="formula-body" id="hypoFormula">—</div></details>
       </div>
     </section>
 
@@ -400,7 +410,7 @@
       </details>
     </div>
 
-    <div class="footer">Under construction · Test version · v6<br>Patient inputs are not persisted; calculations run locally in the browser.</div>
+    <div class="footer">Under construction · Test version · v6<br>Recent 5 patients are saved on this device only; calculations run locally in the browser.</div>
   </main>
 </div>
 
@@ -409,7 +419,7 @@
   Pediatric Anesthesia Quick Reference v6
   Zero dependency; all calculations local.
   Safety architecture: raw input -> validation -> ONE pure calculation engine -> render.
-  Patient inputs are intentionally NOT persisted.
+  Recent patient storage and offline installation are handled by app.js.
 */
 (() => {
   'use strict';
@@ -671,20 +681,22 @@
     return r;
   }
 
-  function localCalc(p){
-    const factor=p.totalMonths<6?.7:1;
-    // Absolute caps are agent-specific. When the cited source does not provide a defensible
-    // pediatric/label cap for this exact use, large-patient totals are suppressed rather than invented.
-    const agents=[
+  const LOCAL_AGENTS=[
       {key:'lidocaine1',name:'Lidocaine 1%',stdMgKg:4.5,mgMl:10,absCapMg:300,capSource:'DailyMed: adult absolute ceiling 300 mg; pediatric label advises age/weight dosing and lowest effective dose.'},
       {key:'lidocaine1Epi',name:'Lidocaine 1% + epi',stdMgKg:7,mgMl:10,absCapMg:500,capSource:'DailyMed: adult absolute ceiling 500 mg with epinephrine; pediatric dosing remains age/weight based.'},
       {key:'mepivacaine1',name:'Mepivacaine 1%',stdMgKg:5,mgMl:10,absCapMg:400,capSource:'DailyMed: pediatric dose should not exceed 5–6 mg/kg; recommended single adult dose usually ≤400 mg.'},
       {key:'mepivacaine1Epi',name:'Mepivacaine 1% + vasoconstrictor',stdMgKg:5,mgMl:10,absCapMg:400,capSource:'No separate FDA pediatric absolute cap identified for this exact formulation; 400 mg is the product-label usual adult single-dose ceiling, used only as an upper safety stop.'},
       {key:'bupivacaine025',name:'Bupivacaine 0.25%',stdMgKg:2.5,mgMl:2.5,absCapMg:175,capSource:'DailyMed adult Table 3: up to 175 mg without epinephrine for infiltration/peripheral nerve block; pediatric use still requires lower individualized dosing.'},
       {key:'ropivacaine02',name:'Ropivacaine 0.2%',stdMgKg:2.5,mgMl:2,absCapMg:null,verifyOverKg:50,capSource:'U.S. ropivacaine labeling is adult-only and no reliable pediatric absolute cap for this quick-reference use was identified; verify cap in larger children/adolescents.'}
-    ];
+  ];
+
+  function localCalc(p){
+    const factor=p.totalMonths<6?.7:1;
+    // Absolute caps are agent-specific. When the cited source does not provide a defensible
+    // pediatric/label cap for this exact use, large-patient totals are suppressed rather than invented.
+
     const out={factor,youngInfant:p.totalMonths<6,agents:{}};
-    for(const a of agents){
+    for(const a of LOCAL_AGENTS){
       const adjustedMgKg=a.stdMgKg*factor;
       const rawMg=p.w*adjustedMgKg;
       const verify=(!a.absCapMg && p.w>(a.verifyOverKg||50));
@@ -728,8 +740,18 @@
     return{valid:true,patient:p,safety,hct:{...hct,mablError:hct.valid?null:hct.errors.join(' ')},airway,ventilation:{tidalVolumeMl:[p.w*vent.vt[0],p.w*vent.vt[1]],vtPerKg:vent.vt,rr:vent.rr,ti:vent.ti,peep:[5,8],obesityNote:'Uses actual weight only when no gross age–weight mismatch is flagged. In obesity, select an appropriate PBW/IBW strategy rather than blindly using TBW.'},vascular,fluids:{maintenanceMlHr:maintenance(p.w),bolus10Ml:10*p.w,bolus20Ml:20*p.w,ebvMl:[p.w*ebv.lo,p.w*ebv.hi],ebv,mabl},vitals:{band:vit,hypotension},drugs:drugCalculations(p),pals:{epinephrine:{mg:epiMg,concentrationMgMl:.1,ml:epiMg/.1},atropineMg:Math.min(Math.max(.02*p.w,.1),.5),amiodaroneMg:Math.min(5*p.w,300),lidocaineMg:p.w,adenosineFirstMg:Math.min(.1*p.w,6),adenosineSecondMg:Math.min(.2*p.w,12),shockJ:[2*p.w,4*p.w],shock10J:10*p.w},emergency,local:localCalc(p)};
   }
 
-  function rowHtml(label,sub,value,detail=''){return `<div class="row"><div><div class="label">${label}</div><div class="sub">${sub}</div></div><div class="value">${value}</div></div>${detail?`<details class="formula"><summary>Formula / note</summary><div class="formula-body">${detail}</div></details>`:''}`;}
+  function rowHtml(label,sub,value,detail=''){
+    const contents=`<div><div class="label">${label}</div><div class="sub">${sub}</div></div><div class="value">${value}</div>`;
+    return detail?`<details class="item-note"><summary class="row">${contents}</summary><div class="formula-body">${detail}</div></details>`:`<div class="row">${contents}</div>`;
+  }
+  function setCard(id,html){
+    const card=$(id),open=new Set([...card.querySelectorAll('details[open]')].map(el=>el.querySelector('.label')?.textContent||el.querySelector('summary')?.textContent));
+    card.innerHTML=html;
+    card.querySelectorAll('details').forEach(el=>{el.open=open.has(el.querySelector('.label')?.textContent||el.querySelector('summary')?.textContent);});
+  }
   const groupTitle=t=>`<div class="drug-group-title">${t}</div>`;
+
+  const LOCAL_PRECAUTIONS=`<details class="item-note standalone-note"><summary>Combining local anesthetics</summary><div class="formula-body">Maximum doses of different local anesthetics are not independently additive. Use fractional-dose accounting and the minimum effective dose. In obesity, an age-weight plausibility screen is not enough; confirm the appropriate dosing scalar for the block/drug. Height/IBW is intentionally deferred until a validated pediatric obesity rule is selected.</div></details>`;
 
   function render(r){
     const p=r.patient,a=r.airway;
@@ -739,7 +761,7 @@
     $('ettFormula').innerHTML=a.formula;
     $('ettDepth').textContent=a.depthDisplay;$('depthFormula').innerHTML=a.depthFormula;
     $('weightEtt').innerHTML=a.weightGuide?`${n(a.weightGuide.ett)} mm<small>${a.weightGuide.depth} cm • ${a.weightGuide.blade}</small>`:`—<small>${a.neonatal?'neonatal algorithm active':'outside CHBC 3–36 kg table'}</small>`;
-    $('lma').textContent=a.lma;$('blade').textContent=a.blade;$('mask').textContent=a.mask;$('suction').textContent=`${a.suctionFr} Fr`;
+    $('lma').textContent=a.lma;$('blade').textContent=a.blade;
 
     const vv=r.ventilation;
     $('vt').textContent=r.safety.outlier?'Verify PBW/IBW':range(vv.tidalVolumeMl[0],vv.tidalVolumeMl[1]);$('ventRR').textContent=vv.rr;$('ti').textContent=vv.ti;
@@ -787,7 +809,7 @@
     html+=rowHtml('Ondansetron IV','Age/weight specific • max 4 mg',d.ondansetron.display,d.ondansetron.note);
     html+=rowHtml('Dexamethasone IV — PONV','0.15 mg/kg • max 4 mg',d.dexamethasonePONV.display,d.dexamethasonePONV.note);
     html+=rowHtml('Acetaminophen IV','Age/weight specific',d.acetaminophenIV.display,d.acetaminophenIV.note);
-    $('drugCard').innerHTML=r.safety.outlier?`<div class="alert-card red" style="margin:12px"><strong>Routine weight-based anesthesia doses suppressed.</strong> The entered weight is grossly discordant with age, so TBW may be the wrong dosing scalar and uncapped mg/kg values could be misleading. Confirm the measured weight, then use drug-specific obesity/maximum-dose guidance.</div>`:html;
+    setCard('drugCard',r.safety.outlier?`<div class="alert-card red" style="margin:12px"><strong>Routine weight-based anesthesia doses suppressed.</strong> The entered weight is grossly discordant with age, so TBW may be the wrong dosing scalar and uncapped mg/kg values could be misleading. Confirm the measured weight, then use drug-specific obesity/maximum-dose guidance.</div>`:html);
 
     const pa=r.pals;html=groupTitle('Cardiac arrest / bradycardia');
     html+=rowHtml('Epinephrine IV/IO','0.01 mg/kg • 0.1 mg/mL • max 1 mg',`${doseNumber(pa.epinephrine.mg)} mg<small>${doseNumber(pa.epinephrine.ml,'mL')} mL of 0.1 mg/mL</small>`,`<code>0.01 mg/kg × ${n(w)} kg</code> = ${doseNumber(pa.epinephrine.mg)} mg; divide by 0.1 mg/mL = <b>${doseNumber(pa.epinephrine.ml,'mL')} mL</b>.`);
@@ -800,7 +822,7 @@
     html+=rowHtml('Synchronized cardioversion','0.5–1 J/kg → 2 J/kg',`${range(.5*w,w,'J')}<small>then ${n(2*w,0)} J</small>`,'Weight-based energy reference.');
     html+=groupTitle('Defibrillation');
     html+=rowHtml('Shock energy','2 J/kg → 4 J/kg → ≥4 J/kg',`${n(pa.shockJ[0],0)} → ${n(pa.shockJ[1],0)} J<small>10 J/kg = ${n(pa.shock10J,0)} J; adult max applies</small>`,'2025 AHA/AAP reference.');
-    $('palsCard').innerHTML=html;
+    setCard('palsCard',html);
 
     const e=r.emergency;html=groupTitle('Local anesthetic systemic toxicity (LAST)');
     if(e.last.mode==='weight'){
@@ -819,7 +841,7 @@
     html+=rowHtml('Dantrolene IV — initial','2.5 mg/kg using true weight',`${doseNumber(e.mh.dantroleneMg)} mg<small>repeat as needed per MHAUS response</small>`,`MHAUS initial dose 2.5 mg/kg using true weight. If symptoms persist, repeated dosing may be needed; contact MH resources/hotline.`);
     html+=rowHtml('Dantrium / Revonto','20 mg vial • +60 mL sterile water',`${e.mh.dantriumVials} vial(s)<small>dose volume ≈ ${n(e.mh.dantriumVolumeMl,0)} mL</small>`,'Vial count is rounded up to ensure enough drug is available; dose volume is based on 20 mg/60 mL after reconstitution.');
     html+=rowHtml('Ryanodex','250 mg vial • +5 mL sterile water',`${e.mh.ryanodexVials} vial(s)<small>dose volume ≈ ${n(e.mh.ryanodexVolumeMl,1)} mL</small>`,'Vial count is rounded up; reconstituted concentration is 50 mg/mL.');
-    $('emergencyCard').innerHTML=html;
+    setCard('emergencyCard',html);
 
     const l=r.local;
     $('localWarning').innerHTML=(l.youngInfant?'<strong>&lt;6 months:</strong> this calculator applies a 30% reduction to the listed amide ceiling (×0.70). ':'')+'Each agent now has its own cap logic. Adult label absolute maxima are used only as upper safety stops where clearly available; they do not convert an adult label into a pediatric target. If no defensible absolute cap was identified, large-patient totals display <strong>Verify cap</strong> instead of an uncapped number.';
@@ -829,10 +851,88 @@
       const cap=a.absCapMg!=null?`<br><code>displayed maximum = min(raw, ${a.absCapMg} mg)</code>`:'<br>No reliable absolute cap identified for this quick-reference use; >50 kg triggers Verify.';
       html+=rowHtml(a.name,`${n(a.adjustedMgKg,2)} mg/kg${l.youngInfant?` (standard ${n(a.stdMgKg,2)} × 0.70)`:''} • ${a.mgMl} mg/mL`,value,`${raw}${cap}<br>${a.capSource}${l.youngInfant?'<br>AAP/AAPD: reduce amide doses by 30% in infants <6 months.':''}`);
     }
-    html+=`<details class="formula"><summary>Combination / obesity rule</summary><div class="formula-body">Maximum doses of different local anesthetics are not independently additive. Use fractional-dose accounting and the minimum effective dose. In obesity, an age-weight plausibility screen is not enough; confirm the appropriate dosing scalar for the block/drug. Height/IBW is intentionally deferred until a validated pediatric obesity rule is selected.</div></details>`;$('localCard').innerHTML=html;
+    html+=LOCAL_PRECAUTIONS;setCard('localCard',html);
+  }
+
+
+  // General rules are visible without a patient. Never calculate a fictitious default case.
+  const REFERENCE_ROWS = {
+    "drugCard": [
+      ["Induction / sedation", "Propofol IV induction", "Age/weight-specific reference"],
+      ["Induction / sedation", "Ketamine IV induction", "1–2 mg/kg"],
+      ["Induction / sedation", "Ketamine IM — procedural sedation", "4 mg/kg initial; total up to 6 mg/kg"],
+      ["Induction / sedation", "Etomidate IV induction", "Age/weight-specific reference"],
+      ["Premedication / adjunct", "Midazolam IV — initial", "Age/weight-specific reference"],
+      ["Premedication / adjunct", "Midazolam PO premed", "0.25–0.5 mg/kg • max 20 mg"],
+      ["Premedication / adjunct", "Dexmedetomidine IN premed", "2–3 mcg/kg"],
+      ["Premedication / adjunct", "Fentanyl IV", "1–2 mcg/kg"],
+      ["Premedication / adjunct", "Glycopyrrolate IV — intraop", "0.004 mg/kg • max 0.1 mg"],
+      ["Premedication / adjunct", "Atropine — perioperative/intubation", "0.02 mg/kg • no PALS minimum"],
+      ["Neuromuscular blockade", "Succinylcholine IV", "Age/weight-specific reference"],
+      ["Neuromuscular blockade", "Rocuronium — routine", "0.6 mg/kg"],
+      ["Neuromuscular blockade", "Rocuronium — RSI", "1.2–1.6 mg/kg"],
+      ["Neuromuscular blockade", "Vecuronium", "0.1 mg/kg"],
+      ["Neuromuscular blockade", "Cisatracurium", "Age-specific"],
+      ["Reversal", "Sugammadex — moderate", "2 mg/kg"],
+      ["Reversal", "Sugammadex — deep", "4 mg/kg"],
+      ["Reversal", "Neostigmine IV", "0.03–0.07 mg/kg • max 5 mg"],
+      ["Reversal", "Glycopyrrolate with neostigmine", "0.2 mg per 1 mg neostigmine"],
+      ["PONV / analgesia", "Ondansetron IV", "Age/weight specific • max 4 mg"],
+      ["PONV / analgesia", "Dexamethasone IV — PONV", "0.15 mg/kg • max 4 mg"],
+      ["PONV / analgesia", "Acetaminophen IV", "Age/weight specific"]
+    ],
+    "palsCard": [
+      ["Cardiac arrest / bradycardia", "Epinephrine IV/IO", "0.01 mg/kg • 0.1 mg/mL • max 1 mg"],
+      ["Cardiac arrest / bradycardia", "Atropine — PALS bradycardia", "0.02 mg/kg • min 0.1 • max 0.5"],
+      ["Cardiac arrest / bradycardia", "Amiodarone IV/IO", "5 mg/kg • max 300 mg"],
+      ["Cardiac arrest / bradycardia", "Lidocaine IV/IO", "1 mg/kg"],
+      ["SVT / cardioversion", "Adenosine — first", "0.1 mg/kg • max 6 mg"],
+      ["SVT / cardioversion", "Adenosine — second", "0.2 mg/kg • max 12 mg"],
+      ["SVT / cardioversion", "Synchronized cardioversion", "0.5–1 J/kg → 2 J/kg"],
+      ["Defibrillation", "Shock energy", "2 J/kg → 4 J/kg → ≥4 J/kg"]
+    ],
+    "emergencyCard": [
+      ["Local anesthetic systemic toxicity (LAST)", "20% lipid emulsion — bolus", "~1.5 mL/kg over 2–3 min"],
+      ["Local anesthetic systemic toxicity (LAST)", "20% lipid emulsion — infusion", "~0.25 mL/kg/min"],
+      ["Anaphylaxis", "Epinephrine IM — 1 mg/mL", "0.01 mg/kg IM • cap 0.3 mg if <30 kg; 0.5 mg if ≥30 kg"],
+      ["Anaphylaxis", "Epinephrine IV/IO — perioperative", "1–10 mcg/kg as needed"],
+      ["Laryngospasm", "Succinylcholine IM", "SPA: 2–4 mg/kg if no IV • absolute max 150 mg"],
+      ["Laryngospasm", "Atropine if bradycardic", "SPA: 0.02 mg/kg IV; 0.04 mg/kg IM"],
+      ["Malignant hyperthermia", "Dantrolene IV — initial", "2.5 mg/kg using true weight"],
+      ["Malignant hyperthermia", "Dantrium / Revonto", "20 mg vial • +60 mL sterile water"],
+      ["Malignant hyperthermia", "Ryanodex", "250 mg vial • +5 mL sterile water"]
+    ]
+  };
+  const referenceDetails={
+    ettFormula:'Age 2–<14 yr: <code>cuffed ETT ID = age/4 + 3.5</code>; prepare adjacent available sizes. Infants use age/weight guidance. Newborns use the neonatal weight guide. Age ≥14 yr: adult/adolescent sizing; verify locally.',
+    depthFormula:'Child reference: <code>age/2 + 12</code> cm; cross-checks include <code>3 × calculated ID</code> and <code>weight/5 + 12</code>. Newborn lip depth: <code>weight (kg) + 6</code> cm. Corrected-gestation guidance and clinical confirmation take priority.',
+    ventFormula:'Enter age and weight for the applicable tidal-volume range, respiratory rate and inspiratory time. Use an appropriate predicted/ideal body-weight strategy in obesity.',
+    pivFormula:'Age/weight lookup only; ultrasound/vein caliber and required flow take priority.',
+    alineFormula:'Age/weight reference only; ultrasound artery diameter takes priority.',
+    cvcFormula:'Confirm vein diameter, lumens, flow, site and institutional practice.',
+    ioFormula:'Device-specific needle selection remains authoritative.',
+    hypoFormula:'Neonate: SBP <60 mmHg. Infant: SBP <70 mmHg. Age 1–10 yr: <code>70 + 2 × age</code> mmHg. Age >10 yr: SBP <90 mmHg.',
+    mablFormula:'<code>MABL = EBV × (Hctᵢ − Hctₜ)/Hctᵢ</code>. Enter age, weight, initial and target Hct.'
+  };
+  const defaultLocalWarning=$('localWarning').innerHTML;
+  function renderReference(){
+    document.querySelectorAll('main .value[id], main .m-value[id]').forEach(el=>{el.textContent='—';});
+    $('ebvBand').textContent='Age-specific mL/kg range';
+    for(const [id,html] of Object.entries(referenceDetails)) $(id).innerHTML=html;
+    for(const [id,rows] of Object.entries(REFERENCE_ROWS)){
+      let group='',html='';
+      for(const [heading,label,rule] of rows){
+        if(heading!==group){html+=groupTitle(heading);group=heading;}
+        html+=rowHtml(label,rule,'—',`${rule}. Enter age and weight for the applicable dose, limits and patient-specific notes.`);
+      }
+      setCard(id,html);
+    }
+    $('localWarning').innerHTML=defaultLocalWarning;
+    setCard('localCard',LOCAL_AGENTS.map(a=>rowHtml(a.name,`${n(a.stdMgKg,2)} mg/kg standard • ${a.mgMl} mg/mL`,'—',`${a.capSource}<br>Infants <6 months: the tool applies a 30% reduction to the listed amide ceiling. Enter age and weight for the adjusted dose and cap checks.`)).join('')+LOCAL_PRECAUTIONS);
   }
 
   function clearResultsState(errors=[]){
+    renderReference();
     document.body.classList.add('no-patient');
     $('patientSummary').textContent=errors.length?'Check patient input':'Enter age and weight';
     $('liveBadge').textContent='WAITING';$('liveBadge').className='pill lookup';
@@ -853,11 +953,12 @@
 
   function update(){
     const raw=readRawInputs(),v=validateInput(raw),hctV=validateHct(raw);markValidity(v,hctV);
-    if(!v.valid){clearResultsState(v.errors);return null;}
+    if(!v.valid){clearResultsState(Object.values(raw).some(value=>value!=='')?v.errors:[]);return null;}
     const r=calculatePatient({ageYears:v.values.y,ageMonths:v.values.m,weightKg:v.values.w,hctInitial:raw.hctInitial===''?null:raw.hctInitial,hctTarget:raw.hctTarget===''?null:raw.hctTarget});
     validationEl.classList.add('hidden');validationEl.textContent='';
     const key=weightKey(v);
     if(r.safety.outlier && confirmedWeightKey!==key){
+      renderReference();
       document.body.classList.add('no-patient');
       $('patientSummary').innerHTML=`<strong>${v.values.y} yr ${v.values.m} mo</strong> • <strong>${n(v.values.w)} kg</strong>`;
       $('liveBadge').textContent='CHECK WEIGHT';$('liveBadge').className='pill lookup';
@@ -884,8 +985,7 @@
     el.addEventListener('blur',()=>{markValidity(validateInput(readRawInputs()),validateHct(readRawInputs()));});
   });
   $('confirmWeightBtn').addEventListener('click',()=>{const v=validateInput(readRawInputs());if(v.valid){confirmedWeightKey=weightKey(v);update();}});
-  $('resetBtn').addEventListener('click',()=>{ageY.value='';ageM.value='';weightEl.value='';hctInitialEl.value='';hctTargetEl.value='';confirmedWeightKey=null;clearResultsState();window.scrollTo({top:0,behavior:'smooth'});});
-  $('formulaBtn').addEventListener('click',()=>{const all=[...document.querySelectorAll('details.formula')],open=all.length&&all.every(d=>d.open);all.forEach(d=>d.open=!open);$('formulaBtn').textContent=open?'Show formulas':'Hide formulas';});
+  $('resetBtn').addEventListener('click',()=>{loadPatient();window.scrollTo({top:0,behavior:'smooth'});});
 
   function runSelfTests(){
     const checks=[];const check=(name,ok,detail='')=>checks.push({name,ok:!!ok,detail});
@@ -914,12 +1014,18 @@
   }
 
 
-  window.PediatricAnesthesiaCalculator={calculate:calculatePatient,update,validate:validateInput,runSelfTests,version:'6.0.0'};
+  function loadPatient(raw={}){
+    ageY.value=raw.ageYears??'';ageM.value=raw.ageMonths??'';weightEl.value=raw.weightKg??'';
+    hctInitialEl.value=raw.hctInitial??'';hctTargetEl.value=raw.hctTarget??'';
+    confirmedWeightKey=null;return update();
+  }
+  window.PediatricAnesthesiaCalculator={calculate:calculatePatient,update,validate:validateInput,read:readRawInputs,load:loadPatient,runSelfTests,version:'6.1.0'};
   clearResultsState();
   if(new URLSearchParams(location.search).get('selftest')==='1'){
     const report=runSelfTests();const pre=document.createElement('pre');pre.id='selftestReport';pre.dataset.selftest=`${report.passed}/${report.total}`;pre.textContent=JSON.stringify(report,null,2);document.body.appendChild(pre);
   }
 })();
 </script>
+<script type="module" src="./app.js"></script>
 </body>
 </html>
