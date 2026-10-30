@@ -157,6 +157,9 @@
   }
   .metric .m-label { font-size:11px; color:var(--muted); font-weight:700; }
   .metric .m-value { font-size:22px; font-weight:850; margin-top:5px; letter-spacing:-.02em; }
+  #rrReference table { width:100%; border-collapse:collapse; font-size:11px; }
+  #rrReference th, #rrReference td { text-align:left; padding:6px 3px; border-bottom:1px solid var(--line); }
+  #rrReference td:last-child { white-space:nowrap; }
   .metric .m-sub { font-size:10px; color:var(--muted); margin-top:4px; line-height:1.35; }
 
   .refs { margin: 18px 0 10px; }
@@ -295,7 +298,7 @@
       <div class="section-head"><div><h2>Ventilation</h2><div class="kicker">Initial reference settings</div></div><span class="pill ref">REFERENCE</span></div>
       <div class="two-col">
         <details class="metric item-note"><summary><div class="m-label">Tidal volume</div><div class="m-value" id="vt">—</div><div class="m-sub">mL • calculated from weight</div></summary><div class="formula-body" id="ventFormula">Enter age and weight for ventilation references.</div></details>
-        <div class="metric"><div class="m-label">Initial RR</div><div class="m-value" id="ventRR">—</div><div class="m-sub">breaths/min</div></div>
+        <details class="metric item-note"><summary><div class="m-label">Initial RR</div><div class="m-value" id="ventRR">—</div><div class="m-sub">breaths/min · approximate start</div></summary><div class="formula-body" id="rrReference"></div></details>
         <div class="metric"><div class="m-label">Inspiratory time</div><div class="m-value" id="ti">—</div><div class="m-sub">seconds</div></div>
         <div class="metric"><div class="m-label">PEEP</div><div class="m-value">5–8</div><div class="m-sub">cm H₂O, initial reference</div></div>
       </div>
@@ -535,13 +538,23 @@
     return{name:'12+ yr',hr:'50–104',rr:'12–25',bp:'105–136 / 62–87',map:'76–103'};
   }
 
+  // Owner-supplied approximate starting respiratory rates; independent of Ti/Vt bands.
+  const INITIAL_RR_BANDS=[
+    {beforeMonths:1,label:'Newborn (<1 mo)',rr:'30–40'},
+    {beforeMonths:12,label:'Infant (1–11 mo)',rr:'25–35'},
+    {beforeMonths:48,label:'1–3 yr',rr:'20–30'},
+    {beforeMonths:84,label:'4–6 yr',rr:'18–25'},
+    {beforeMonths:156,label:'7–12 yr',rr:'14–20'},
+    {beforeMonths:Infinity,label:'Adolescent (13–18 yr)',rr:'12–16'}
+  ];
   function ventBand(months){
-    if(months<1)return{rr:'30–35',ti:'0.60',vt:[6,7]};
-    if(months<12)return{rr:'25–35',ti:'0.60–0.70',vt:[6,8]};
-    if(months<48)return{rr:'20–26',ti:'0.70–0.75',vt:[6,8]};
-    if(months<72)return{rr:'18–24',ti:'0.75–0.80',vt:[6,8]};
-    if(months<=120)return{rr:'16–22',ti:'0.80–0.90',vt:[6,8]};
-    return{rr:'14–20',ti:'0.80–1.0',vt:[6,8]};
+    const rr=INITIAL_RR_BANDS.find(band=>months<band.beforeMonths).rr;
+    if(months<1)return{rr,ti:'0.60',vt:[6,7]};
+    if(months<12)return{rr,ti:'0.60–0.70',vt:[6,8]};
+    if(months<48)return{rr,ti:'0.70–0.75',vt:[6,8]};
+    if(months<72)return{rr,ti:'0.75–0.80',vt:[6,8]};
+    if(months<=120)return{rr,ti:'0.80–0.90',vt:[6,8]};
+    return{rr,ti:'0.80–1.0',vt:[6,8]};
   }
 
   function maintenance(w){if(w<=10)return 4*w;if(w<=20)return 40+2*(w-10);return 60+(w-20);}
@@ -1019,7 +1032,8 @@
     hctInitialEl.value=raw.hctInitial??'';hctTargetEl.value=raw.hctTarget??'';
     confirmedWeightKey=null;return update();
   }
-  window.PediatricAnesthesiaCalculator={calculate:calculatePatient,update,validate:validateInput,read:readRawInputs,load:loadPatient,runSelfTests,version:'6.1.0'};
+  $('rrReference').innerHTML='<table><thead><tr><th>Age</th><th>Starting RR</th></tr></thead><tbody>'+INITIAL_RR_BANDS.map(band=>`<tr><td>${band.label}</td><td>${band.rr}/min</td></tr>`).join('')+'</tbody></table>';
+  window.PediatricAnesthesiaCalculator={calculate:calculatePatient,update,validate:validateInput,read:readRawInputs,load:loadPatient,runSelfTests,version:'6.1.1'};
   clearResultsState();
   if(new URLSearchParams(location.search).get('selftest')==='1'){
     const report=runSelfTests();const pre=document.createElement('pre');pre.id='selftestReport';pre.dataset.selftest=`${report.passed}/${report.total}`;pre.textContent=JSON.stringify(report,null,2);document.body.appendChild(pre);
