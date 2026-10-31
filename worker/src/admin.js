@@ -6,8 +6,7 @@ export function adminPage(nonce) {
 </style></head><body><main>
 <h1>Dawei Sun · 私人访客记录</h1>
 <p>记录保留 90 天 · 北京时间（UTC+8） · 最新记录每分钟刷新，采集和同步可能有延迟。</p>
-<p>前台停留：页面可见且在线的时间，静静阅读也计时；活跃：最近 60 秒有操作的时间。切后台或锁屏时暂停。滚动进度按每次访问分别显示：0% 为顶部，100% 为底部。多次访问的时长会累计。</p>
-<p>旧版只记录了部分活跃时间和屏幕已显示深度，无法补算前台停留或转换成新进度。IP 定位为近似值，匿名标签不能确认个人身份。</p>
+<p>停留和深度按本批次记录汇总，单次访问与点击详情请展开历史记录。IP 定位为近似值，匿名标签不能确认个人身份。</p>
 <form id="login"><label for="token">管理员访问密钥</label><input id="token" type="password" required maxlength="256" autocomplete="off" spellcheck="false"><button type="submit">查看记录</button></form>
 <div id="controls" class="controls" hidden><button id="refresh">刷新最新记录</button><button id="older" class="secondary" disabled>更早记录</button><button id="logout" class="secondary">退出</button></div>
 <p id="status" role="status" aria-live="polite">请输入密钥。密钥只保存在当前页面内存中。</p>
@@ -20,7 +19,10 @@ const CLIENT = String.raw`
   const $ = id => document.getElementById(id);
   let token = '', nextCursor = null, controller = null, generation = 0, loading = false, viewingHistory = false, updatedAt = '';
   const time = value => value ? new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', year:'numeric', month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false }).format(new Date(value)) : '—';
-  const duration = seconds => Math.floor(seconds / 60) + '分 ' + seconds % 60 + '秒';
+  const duration = seconds => {
+    const total = Math.max(0, Math.floor(Number(seconds) || 0));
+    return total < 60 ? total + '秒' : Math.floor(total / 60) + '分' + total % 60 + '秒';
+  };
   function status(text, error = false) { $('status').textContent = text; $('status').dataset.error = String(error); }
   function logout(message = '已退出。请输入密钥。') {
     generation++;
@@ -39,34 +41,42 @@ const CLIENT = String.raw`
     }
     const wrapper = document.createElement('div'); wrapper.className = 'table-wrap';
     const table = document.createElement('table'); const thead = table.createTHead(); const heading = thead.insertRow();
-    for (const title of ['IP / 匿名标签','近似位置 / 网络','页面访问次数','首次 / 最近记录','设备','本批次累计时长 / 点击','逐次页面访问','来源域名']) {
+    for (const title of ['IP / 匿名标签','近似位置 / 网络','页面访问次数','首次 / 最近记录','设备','停留 / 深度','历史页面访问记录','来源域名']) {
       const th = document.createElement('th'); th.scope = 'col'; th.textContent = title; heading.append(th);
     }
     const body = table.createTBody();
     for (const v of data.visitors) {
       const row = body.insertRow();
-      const clicks = Object.entries(v.linkClicks).map(([type,count]) => type + ': ' + count).join(', ');
-      const totals = [(v.visits.length ? '前台停留 '+duration(v.totalVisibleSeconds) : '前台停留：旧版未记录'),
-        ...(v.visits.length ? ['活跃 '+duration(v.totalMeasuredActiveSeconds)] : []), ...(clicks ? [clicks] : []),
-        ...(v.legacyEventCount ? ['旧版活跃 '+duration(v.legacyActiveSeconds)+'；旧版显示深度 '+v.legacyDisplayDepthPercent+'%'] : [])].join('\n');
+      const hasCurrentMetrics = v.visits.length > 0;
+      const seconds = hasCurrentMetrics ? v.totalVisibleSeconds : v.legacyActiveSeconds;
+      const depth = hasCurrentMetrics ? Math.max(...v.visits.map(visit => visit.maxScrollPercent)) : v.legacyDisplayDepthPercent;
+      const totals = '停留 ' + duration(seconds) + '\n深度：' + depth + '%';
       const values = [v.ip + '\n' + v.visitorId,
         [v.city,v.region,v.country].filter(Boolean).join(', ') + '\n' + [v.asOrganization,v.asn ? 'AS'+v.asn : ''].filter(Boolean).join(' / '),
         String(v.visitCount), time(v.firstSeen)+'\n'+time(v.lastSeen),
         [v.deviceType,v.browser,v.os,v.browserTimezone,v.colorScheme].filter(Boolean).join(' / '), totals];
       for (const value of values) row.insertCell().textContent = value;
       const visitsCell = row.insertCell();
-      if (v.visits.length) {
-        const details = document.createElement('details');
-        details.dataset.visitor = v.ip+'|'+v.visitorId;
-        details.open = expanded.has(details.dataset.visitor);
-        const summary = document.createElement('summary'); summary.textContent = '查看 '+v.visits.length+' 次访问'; details.append(summary);
-        for (const visit of v.visits) {
-          const entry = document.createElement('p');
-          entry.textContent = visit.path+'\n最近记录 '+time(visit.lastSeen)+'\n前台 '+duration(Math.floor(visit.visibleMs/1000))+' · 活跃 '+duration(Math.floor(visit.activeMs/1000))+'\n最大滚动进度 '+visit.maxScrollPercent+'%';
-          details.append(entry);
-        }
-        visitsCell.append(details);
-      } else { visitsCell.textContent = v.paths.join('\n')+'\n旧版数据无法区分单次访问'; }
+      const details = document.createElement('details');
+      details.dataset.visitor = v.ip+'|'+v.visitorId;
+      details.open = expanded.has(details.dataset.visitor);
+      const summary = document.createElement('summary'); summary.textContent = '查看记录'; details.append(summary);
+      for (const visit of v.visits) {
+        const entry = document.createElement('p');
+        entry.textContent = visit.path+'\n首次记录 '+time(visit.firstSeen)+'\n最近记录 '+time(visit.lastSeen)+'\n停留 '+duration(visit.visibleMs/1000)+'\n深度：'+visit.maxScrollPercent+'%';
+        details.append(entry);
+      }
+      if (v.legacyEventCount) {
+        const legacy = document.createElement('p');
+        legacy.textContent = '早期记录汇总\n'+v.paths.join('、')+'\n停留 '+duration(v.legacyActiveSeconds)+'\n深度：'+v.legacyDisplayDepthPercent+'%\n早期记录采用旧统计口径，仅供参考，无法拆分为单次访问。';
+        details.append(legacy);
+        if (!hasCurrentMetrics) row.cells[5].title = '早期记录采用旧统计口径，仅供参考；说明见历史页面访问记录。';
+      }
+      const clicks = Object.entries(v.linkClicks).map(([type,count]) => type + '：' + count + '次').join('，');
+      if (clicks) {
+        const entry = document.createElement('p'); entry.textContent = '本批次点击记录\n'+clicks; details.append(entry);
+      }
+      visitsCell.append(details);
       row.insertCell().textContent = v.referrers.join('\n') || '直接访问 / 未提供';
     }
     wrapper.append(table); $('result').append(wrapper); wrapper.scrollLeft = scrollLeft;
