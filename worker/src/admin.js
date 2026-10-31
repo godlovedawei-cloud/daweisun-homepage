@@ -5,7 +5,7 @@ export function adminPage(nonce) {
 *{box-sizing:border-box}body{margin:0;color:#20313e;background:#f4f6f8;font:14px/1.6 system-ui,-apple-system,sans-serif}main{max-width:1500px;margin:40px auto;padding:0 24px}h1{font-size:26px;margin:0 0 8px}p{color:#5a6772}form,.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:20px 0}label{font-weight:600}input,button{font:inherit;padding:10px 14px;border:1px solid #bdc9d2;border-radius:6px}input{width:320px;max-width:100%}button{cursor:pointer;background:#203e55;color:white;border-color:#203e55}button:disabled{opacity:.5;cursor:default}button.secondary{color:#203e55;background:#fff}.table-wrap{overflow-x:auto;background:#fff;border:1px solid #dae1e7;border-radius:8px}table{width:100%;border-collapse:collapse;min-width:1280px}th,td{padding:12px;text-align:left;vertical-align:top;border-bottom:1px solid #e5ebef;white-space:pre-line;overflow-wrap:anywhere}th{background:#eaf0f4;font-size:12px}td{max-width:240px}code{font-family:ui-monospace,monospace}.notice{padding:16px;background:white;border-radius:8px}#status{min-height:24px}#status[data-error="true"]{color:#a01e25}[hidden]{display:none!important}@media(max-width:600px){main{margin-top:24px;padding:0 16px}h1{font-size:22px}form{align-items:stretch;flex-direction:column}input{width:100%}}
 </style></head><body><main>
 <h1>Dawei Sun · 私人访客记录</h1>
-<p>记录保留 90 天 · 北京时间（UTC+8） · 最新记录每 10 秒刷新，采集和同步可能有延迟。</p>
+<p>记录保留 90 天 · 北京时间（UTC+8） · 最新记录每分钟刷新，采集和同步可能有延迟。</p>
 <p>前台停留：页面可见且在线的时间，静静阅读也计时；活跃：最近 60 秒有操作的时间。切后台或锁屏时暂停。滚动进度按每次访问分别显示：0% 为顶部，100% 为底部。多次访问的时长会累计。</p>
 <p>旧版只记录了部分活跃时间和屏幕已显示深度，无法补算前台停留或转换成新进度。IP 定位为近似值，匿名标签不能确认个人身份。</p>
 <form id="login"><label for="token">管理员访问密钥</label><input id="token" type="password" required maxlength="256" autocomplete="off" spellcheck="false"><button type="submit">查看记录</button></form>
@@ -90,7 +90,7 @@ const CLIENT = String.raw`
       if (current !== generation) return;
       nextCursor = data.nextCursor; viewingHistory = Boolean(cursor); updatedAt = time(new Date().toISOString());
       render(data); $('controls').hidden = false; $('login').hidden = true;
-      status('更新于 '+updatedAt+'。本批次 '+data.totalEventsLoaded+' 条事件，'+data.visitors.length+' 个 IP / 浏览器组合。'+(data.firstEvent ? '覆盖 '+time(data.firstEvent)+' 至 '+time(data.lastEvent)+'。' : '')+'次数和时长仅汇总当前批次，不代表全部 90 天。'+(viewingHistory ? '历史批次已暂停自动刷新。' : '每 10 秒自动刷新。')+(nextCursor ? '可继续查看更早记录。' : '已到记录末尾。'));
+      status('更新于 '+updatedAt+'。本批次 '+data.totalEventsLoaded+' 条事件，'+data.visitors.length+' 个 IP / 浏览器组合。'+(data.firstEvent ? '覆盖 '+time(data.firstEvent)+' 至 '+time(data.lastEvent)+'。' : '')+'次数和时长仅汇总当前批次，不代表全部 90 天。'+(viewingHistory ? '历史批次已暂停自动刷新。' : '每分钟自动刷新。')+(nextCursor ? '可继续查看更早记录。' : '已到记录末尾。'));
     } catch (error) {
       if (current === generation) status(automatic ? '自动刷新失败；仍显示 '+updatedAt+' 的记录，请重试。' : '加载失败或超时，请重试。', true);
     } finally {
@@ -102,6 +102,6 @@ const CLIENT = String.raw`
   $('refresh').addEventListener('click', () => { nextCursor = null; void load(); });
   $('older').addEventListener('click', () => { if (nextCursor) void load(nextCursor); });
   $('logout').addEventListener('click', () => logout());
-  setInterval(() => { if (token && !viewingHistory && !loading && document.visibilityState === 'visible') void load(undefined, true); }, 10000);
+  setInterval(() => { if (token && !viewingHistory && !loading && document.visibilityState === 'visible') void load(undefined, true); }, 60000);
   window.addEventListener('pagehide', () => logout());
 })();`;
