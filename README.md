@@ -9,6 +9,14 @@ English physician academic homepage with a reverse chronological education and e
 - Public CV: `assets/Dawei-Sun-CV.pdf`. Original CVs and clinical logs remain outside the repository.
 - Styles: `assets/site.css`; academic pages use a small navigation script for dismissing the Tools dropdown. The anesthesia tool uses local JavaScript and an isolated offline worker. Private visit analytics use a dedicated Cloudflare Worker; no external fonts. Tool patient records and inputs remain local.
 
+## 维护文档
+
+- [项目总览与维护规则](agent.md)：结构、内容来源、构建验证与发布约定。
+- [项目日志与当前待办](Log.md)：重要变更、验证、发布状态和未发布草稿。
+- [代理读取入口](AGENTS.md)：后续代理先读的简短入口。
+
+以下已有内容依据与历史说明继续保留供追溯；后续维护规则集中更新总览，新增变更写入日志。
+
 ## Preview and build
 
 ```sh
