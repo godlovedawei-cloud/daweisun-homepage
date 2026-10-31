@@ -4,7 +4,7 @@
   const ENDPOINT = 'https://daweisun-visit-log.yanxiawei-visit-log.workers.dev/collect';
   const ORIGINS = new Set(['https://daweisun.com', 'https://www.daweisun.com']);
   if (!ORIGINS.has(location.origin)) return;
-  const HEARTBEAT_MS = 15000;
+  const HEARTBEAT_MS = 5000;
   const ACTIVE_WINDOW_MS = 60000;
   const STORAGE_KEY = 'daweisun.analytics.visitor.v1';
   let visitorId = '';
@@ -15,39 +15,58 @@
       localStorage.setItem(STORAGE_KEY, visitorId);
     }
   } catch { /* Blocked storage permits anonymous session analytics. */ }
-  let lastMeasuredAt = Date.now();
-  let lastActivityAt = Date.now();
+  const now = () => performance.now();
+  const makePageId = () => Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
+  let pageViewId = makePageId();
+  let lastMeasuredAt = now();
+  let lastActivityAt = lastMeasuredAt;
   let wasVisible = document.visibilityState === 'visible';
-  let pendingActiveMs = 0;
+  let wasOnline = navigator.onLine;
+  let visibleMs = 0;
+  let activeMs = 0;
   let maxScrollPercent = 0;
-  let lastSentScrollPercent = 0;
   let pageviewSent = false;
+  let scrollTimer = null;
+  let lastSentSignature = '';
+  let reportedVisibleMs = 0;
+  let reportedActiveMs = 0;
+  let reportedScrollPercent = 0;
   let referrer = '';
   try { referrer = document.referrer ? new URL(document.referrer).origin : ''; } catch {}
 
   function measure() {
-    const now = Date.now();
-    if (wasVisible && navigator.onLine) {
-      const activeUntil = Math.min(now, lastActivityAt + ACTIVE_WINDOW_MS);
-      pendingActiveMs += Math.max(0, Math.min(HEARTBEAT_MS, activeUntil - lastMeasuredAt));
+    const current = now();
+    if (wasVisible && wasOnline) {
+      visibleMs += Math.max(0, current - lastMeasuredAt);
+      activeMs += Math.max(0, Math.min(current, lastActivityAt + ACTIVE_WINDOW_MS) - lastMeasuredAt);
     }
-    lastMeasuredAt = now;
+    lastMeasuredAt = current;
     wasVisible = document.visibilityState === 'visible';
+    wasOnline = navigator.onLine;
   }
   function scrollPercent() {
-    const height = document.documentElement.scrollHeight;
-    if (height > 0) maxScrollPercent = Math.max(maxScrollPercent,
-      Math.min(100, Math.round((scrollY + innerHeight) / height * 100)));
+    const root = document.scrollingElement || document.documentElement;
+    const viewport = document.documentElement.clientHeight;
+    const range = Math.max(0, root.scrollHeight - viewport);
+    const top = Math.max(0, root.scrollTop);
+    // Scroll travel, not the fraction covered by the viewport. Short pages stay at 0.
+    const percent = range <= 2 ? 0 : range - top <= 2 ? 100 : Math.min(99, Math.floor(top / range * 100));
+    maxScrollPercent = Math.max(maxScrollPercent, percent);
     return maxScrollPercent;
   }
   function send(event) {
     if (!navigator.onLine) return;
+    measure();
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 30000);
       const body = JSON.stringify({
         eventType: event.eventType,
         visitorId,
+        pageViewId,
+        metricsVersion: 2,
+        visibleMs: Math.floor(visibleMs),
+        activeMs: Math.floor(activeMs),
         path: location.pathname,
         referrer,
         language: navigator.language || '',
@@ -57,6 +76,7 @@
         maxScrollPercent: scrollPercent(),
         ...event
       });
+      reportedVisibleMs = visibleMs; reportedActiveMs = activeMs; reportedScrollPercent = maxScrollPercent;
       fetch(ENDPOINT, {
         method: 'POST', mode: 'cors', credentials: 'omit', keepalive: true,
         referrerPolicy: 'no-referrer', headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
@@ -72,13 +92,12 @@
   }
   function engagement() {
     measure();
-    const percent = scrollPercent();
-    if (pageviewSent && navigator.onLine && (pendingActiveMs >= 1000 || percent > lastSentScrollPercent)) {
-      send({ eventType: 'engagement', activeSeconds: Math.floor(pendingActiveMs / 1000) });
-      lastSentScrollPercent = percent;
+    if (!navigator.onLine || !pageviewSent) return;
+    const signature = `${Math.floor(visibleMs)}:${Math.floor(activeMs)}:${scrollPercent()}`;
+    if (signature !== lastSentSignature) {
+      send({ eventType: 'engagement' });
+      lastSentSignature = signature;
     }
-    // Drop disconnected intervals rather than replaying them later.
-    pendingActiveMs = 0;
   }
   function classify(link) {
     let target;
@@ -103,18 +122,45 @@
     if (tracked) { pageview(); send({ eventType: 'link-click', ...tracked }); }
   }, { capture: true });
   for (const eventName of ['keydown', 'pointerdown', 'pointermove', 'scroll', 'touchstart']) {
-    window.addEventListener(eventName, () => { measure(); lastActivityAt = Date.now(); }, { passive: true });
+    window.addEventListener(eventName, () => {
+      measure();
+      lastActivityAt = now();
+      if (eventName === 'scroll' && navigator.onLine) {
+        scrollPercent();
+        // Capture the furthest position immediately, report at most once per second.
+        if (scrollTimer === null) scrollTimer = setTimeout(() => { scrollTimer = null; engagement(); }, 1000);
+      }
+    }, { passive: true });
   }
   document.addEventListener('visibilitychange', () => {
     engagement();
-    if (document.visibilityState === 'visible') { lastActivityAt = Date.now(); pageview(); }
+    if (document.visibilityState === 'visible') { lastActivityAt = now(); pageview(); }
   });
-  window.addEventListener('pagehide', engagement);
+  window.addEventListener('pagehide', () => {
+    engagement();
+    wasVisible = false;
+    if (scrollTimer !== null) { clearTimeout(scrollTimer); scrollTimer = null; }
+  });
   window.addEventListener('pageshow', event => {
-    if (event.persisted) { pageviewSent = false; lastMeasuredAt = lastActivityAt = Date.now(); wasVisible = document.visibilityState === 'visible'; pageview(); }
+    if (event.persisted) {
+      pageViewId = makePageId(); pageviewSent = false;
+      visibleMs = activeMs = maxScrollPercent = 0; lastSentSignature = '';
+      reportedVisibleMs = reportedActiveMs = reportedScrollPercent = 0;
+      lastMeasuredAt = lastActivityAt = now();
+      wasVisible = document.visibilityState === 'visible'; wasOnline = navigator.onLine;
+      pageview();
+    }
   });
-  window.addEventListener('offline', () => { pendingActiveMs = 0; lastMeasuredAt = Date.now(); });
-  window.addEventListener('online', () => { pendingActiveMs = 0; lastMeasuredAt = lastActivityAt = Date.now(); pageview(); });
+  window.addEventListener('offline', () => {
+    measure();
+    wasOnline = false;
+    visibleMs = reportedVisibleMs; activeMs = reportedActiveMs; maxScrollPercent = reportedScrollPercent;
+  });
+  window.addEventListener('online', () => {
+    lastMeasuredAt = lastActivityAt = now();
+    wasOnline = true;
+    pageview();
+  });
   setInterval(() => { pageview(); if (document.visibilityState === 'visible') engagement(); }, HEARTBEAT_MS);
   pageview();
 })();

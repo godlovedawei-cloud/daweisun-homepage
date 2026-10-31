@@ -132,3 +132,12 @@ Deploy from `worker/` using Wrangler. Create a dedicated KV namespace, set its I
 Run `node scripts/test_analytics.mjs` and `python3 scripts/build_site.py --pages-only`. The latter preserves the public CV. Both offline workers include the shared analytics asset in their atomic caches; editing it updates both cache versions. Normal site use and calculations remain available when collection is blocked or unavailable.
 
 Administrator token backup on the owner's Mac: `~/.config/daweisun-visit-log/admin-token.txt` (owner-only permissions). This file is outside the website repository.
+
+
+### Mobile engagement accuracy — October 31, 2026
+
+Version 2 reports cumulative millisecond counters for each random page-view ID. The Worker takes the maximum observed counter for each page view, so duplicate or out-of-order snapshots cannot add time twice, and a later snapshot can cover a missing intermediate request. Foreground time counts quiet reading while the page is visible and online; active time counts only the first 60 seconds after the most recent interaction. Hidden/locked and disconnected intervals are excluded. A monotonic clock avoids wall-clock adjustments, and delayed timers no longer truncate elapsed time to one heartbeat. The frontend reports every 5 seconds, captures each scroll position immediately and reports scroll changes at most once per second. Requests still use 30-second timeouts, no retries and no offline queue.
+
+Scroll progress is scroll travel divided by available scroll range: top is 0%, bottom (within 2 CSS pixels) is 100%, and a page that fits the viewport remains 0%. Each page load has its own progress; the dashboard expands individual visits and labels visitor totals as cumulative. Latest results refresh every 10 seconds while visible; viewing history pauses refresh. Expanded rows and horizontal scroll are preserved during automatic refresh. Data may still arrive late because of network/KV propagation; forced browser termination can lose the last unsent seconds.
+
+Legacy events retain their original values, explicitly labeled as old active time and viewport-covered depth. They cannot reconstruct foreground duration or the new scroll progress. No historical records are deleted or rescaled. Patient fields and stored patient records remain unread by analytics.

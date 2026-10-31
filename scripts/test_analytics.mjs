@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-import worker from '../worker/src/index.js';
+import worker, { aggregateVisitors } from '../worker/src/index.js';
 
 const ORIGIN = 'https://daweisun.com';
 const token = 'test-only-token';
@@ -74,42 +74,92 @@ const second=await (await fetchWorker('/api/visits?cursor='+result.nextCursor,{h
 assert.equal(second.totalEventsLoaded,105);assert.equal(second.nextCursor,null);
 assert.ok(second.lastEvent<result.firstEvent);
 
+// Cumulative snapshots tolerate duplicate, lost and out-of-order requests.
+const visitId = 'a'.repeat(32), otherVisitId = 'b'.repeat(32);
+const cumulative = { ...base, metricsVersion:2, pageViewId:visitId, visibleMs:10000, activeMs:8000, maxScrollPercent:50 };
+assert.equal((await send(cumulative)).status,204);
+assert.equal((await send({...cumulative,pageViewId:'invalid'})).status,400);
+assert.equal((await send({...cumulative,visibleMs:'10000'})).status,400);
+assert.equal((await send({...cumulative,activeMs:-1})).status,400);
+assert.equal((await send({...cumulative,metricsVersion:3})).status,400);
+const sample = (id, path, visibleMs, activeMs, scroll, timestamp) => ({
+ ip:'203.0.113.8',visitorId:'test',metricsVersion:2,pageViewId:id,path,visibleMs,activeMs,maxScrollPercent:scroll,timestamp,eventType:'engagement'
+});
+const combined = aggregateVisitors([
+ sample(visitId,'/',45000,40000,100,'2026-10-31T00:00:45Z'),
+ sample(visitId,'/',45000,40000,100,'2026-10-31T00:00:46Z'),
+ sample(visitId,'/',5000,5000,20,'2026-10-31T00:00:05Z'),
+ sample(otherVisitId,'/publications.html',20000,10000,0,'2026-10-31T00:01:20Z'),
+ {ip:'203.0.113.8',visitorId:'test',path:'/',timestamp:'2026-10-30T00:00:00Z',eventType:'engagement',activeSeconds:7,maxScrollPercent:66}
+])[0];
+assert.equal(combined.visitCount,2);assert.equal(combined.totalVisibleSeconds,65);assert.equal(combined.totalActiveSeconds,57);
+assert.equal(combined.totalMeasuredActiveSeconds,50);assert.equal(combined.legacyActiveSeconds,7);assert.equal(combined.legacyDisplayDepthPercent,66);
+assert.equal(combined.visits.find(v=>v.path==='/publications.html').maxScrollPercent,0);
+assert.equal(combined.visits.find(v=>v.path==='/').visibleMs,45000);
+
 const source=readFileSync(new URL('../assets/analytics.js',import.meta.url),'utf8');
-function browser(path, { online = true, storageBlocked = false, origin = ORIGIN } = {}) {
- const requests=[],readKeys=[],timers=[],listeners={},documentListeners={}; let clock=0;
- class FakeDate extends Date { static now(){return clock;} }
+function browser(path, { online = true, storageBlocked = false, origin = ORIGIN, failNetwork = false } = {}) {
+ const requests=[],readKeys=[],timers=[],scheduled=new Map(),listeners={},documentListeners={};
+ let clock=0,wallOffset=0,nextTimer=0;
+ class FakeDate extends Date { static now(){return clock+wallOffset;} }
  class Element { closest(){return this.link;} }
- const document={visibilityState:'visible',referrer:'https://ref.example/private?secret=NEVER-SEND',documentElement:{scrollHeight:1000},addEventListener:(name,fn)=>documentListeners[name]=fn};
+ const root={scrollHeight:1000,clientHeight:800,scrollTop:0};
+ const document={visibilityState:'visible',referrer:'https://ref.example/private?secret=NEVER-SEND',documentElement:root,scrollingElement:root,addEventListener:(name,fn)=>documentListeners[name]=fn};
  const navigator={onLine:online,language:'en-US'};
  const sandbox={ location:{origin,pathname:path,href:origin+path+'?patient=NEVER-SEND#secret'}, document,navigator,
   localStorage:{getItem(key){readKeys.push(key);if(storageBlocked)throw Error('blocked');return null;},setItem(key){assert.equal(key,'daweisun.analytics.visitor.v1');if(storageBlocked)throw Error('blocked');}},
-  crypto,Date:FakeDate,URL,Element,AbortController,Uint8Array,Intl,screen:{width:1280,height:800},scrollY:0,innerHeight:800,
-  matchMedia:()=>({matches:false}),setTimeout:(fn,ms)=>{timers.push(ms);return 1;},clearTimeout:()=>{},setInterval:fn=>{listeners.interval=fn;},
-  fetch:(url,options)=>{requests.push({url,...options,payload:JSON.parse(options.body)});return Promise.resolve({status:204});}
+  crypto,Date:FakeDate,performance:{now:()=>clock},URL,Element,AbortController,Uint8Array,Intl,screen:{width:402,height:874},
+  matchMedia:()=>({matches:false}),setTimeout:(fn,ms)=>{timers.push(ms);const id=++nextTimer;scheduled.set(id,{fn,at:clock+ms});return id;},clearTimeout:id=>scheduled.delete(id),
+  setInterval:(fn,ms)=>{listeners.interval=fn;listeners.intervalMs=ms;},
+  fetch:(url,options)=>{requests.push({url,...options,payload:JSON.parse(options.body)});return failNetwork ? Promise.reject(Error('offline transport')) : Promise.resolve({status:204});}
  };
  sandbox.window={addEventListener:(name,fn)=>listeners[name]=fn};
  vm.runInNewContext(source,sandbox);
- return{requests,readKeys,timers,listeners,documentListeners,document,navigator,Element,advance:ms=>clock+=ms};
+ return{requests,readKeys,timers,listeners,documentListeners,document,navigator,root,Element,
+  advance:ms=>clock+=ms,jumpWall:ms=>wallOffset+=ms,
+  flushTimers:()=>{for(const [id,timer] of [...scheduled])if(timer.at<=clock){scheduled.delete(id);timer.fn();}}
+ };
 }
 for (const path of ['/', '/publications.html','/tools/anesthesia-dosing/','/tools/pediatric-anesthesia/']) {
  const b=browser(path);assert.equal(b.requests.length,1);assert.equal(b.requests[0].payload.path,path);
  assert.deepEqual(b.readKeys,['daweisun.analytics.visitor.v1']);
- assert.equal(b.requests[0].payload.referrer,'https://ref.example');
+ assert.equal(b.requests[0].payload.referrer,'https://ref.example');assert.equal(b.requests[0].payload.metricsVersion,2);
+ assert.equal(b.requests[0].payload.maxScrollPercent,0);assert.match(b.requests[0].payload.pageViewId,/^[a-f0-9]{32}$/);
  assert.equal(b.requests[0].referrerPolicy,'no-referrer');assert.equal(b.requests[0].credentials,'omit');assert.equal(b.requests[0].keepalive,true);
- assert.deepEqual(b.timers,[30000]); assert.ok(!JSON.stringify(b.requests).includes('NEVER-SEND'));
- b.advance(15000);b.listeners.interval();assert.equal(b.requests[1].payload.activeSeconds,15);
+ assert.deepEqual(b.timers,[30000]);assert.equal(b.listeners.intervalMs,5000);assert.ok(!JSON.stringify(b.requests).includes('NEVER-SEND'));
+ b.advance(15000);b.listeners.interval();assert.equal(b.requests[1].payload.visibleMs,15000);assert.equal(b.requests[1].payload.activeMs,15000);
  const link=new b.Element();link.link={href:ORIGIN+'/assets/Dawei-Sun-CV.pdf?secret=NEVER-SEND#fragment'};
  b.documentListeners.click({target:link});assert.equal(b.requests.at(-1).payload.linkType,'cv');
  assert.equal(b.requests.at(-1).payload.linkTarget,ORIGIN+'/assets/Dawei-Sun-CV.pdf');
- b.navigator.onLine=false;b.listeners.offline();const count=b.requests.length;b.advance(30000);b.listeners.interval();assert.equal(b.requests.length,count);
- b.navigator.onLine=true;b.listeners.online();assert.equal(b.requests.length,count); // No offline replay.
+ b.navigator.onLine=false;b.listeners.offline();const count=b.requests.length;
+ b.advance(30000);b.listeners.interval();assert.equal(b.requests.length,count);
+ b.navigator.onLine=true;b.listeners.online();assert.equal(b.requests.length,count);
+ b.advance(5000);b.listeners.interval();assert.equal(b.requests.at(-1).payload.visibleMs,20000);
  b.document.visibilityState='hidden';b.documentListeners.visibilitychange();const hiddenCount=b.requests.length;
- b.advance(60000);b.document.visibilityState='visible';b.documentListeners.visibilitychange();
- assert.equal(b.requests.length,hiddenCount);
+ b.advance(120000);b.document.visibilityState='visible';b.documentListeners.visibilitychange();assert.equal(b.requests.length,hiddenCount);
+ b.advance(5000);b.listeners.interval();assert.equal(b.requests.at(-1).payload.visibleMs,25000);
 }
+const idle=browser('/');idle.advance(180000);idle.listeners.interval();
+assert.equal(idle.requests.at(-1).payload.visibleMs,180000);assert.equal(idle.requests.at(-1).payload.activeMs,60000);
+idle.listeners.pointerdown();idle.advance(10000);idle.listeners.interval();assert.equal(idle.requests.at(-1).payload.activeMs,70000);
+const delayed=browser('/');delayed.advance(45000);delayed.listeners.interval();
+assert.equal(delayed.requests.at(-1).payload.visibleMs,45000);assert.equal(delayed.requests.at(-1).payload.activeMs,45000);
+const wall=browser('/');wall.advance(5000);wall.jumpWall(3600000);wall.listeners.interval();assert.equal(wall.requests.at(-1).payload.visibleMs,5000);
+const short=browser('/');short.root.scrollHeight=600;short.root.clientHeight=800;short.advance(5000);short.listeners.interval();assert.equal(short.requests.at(-1).payload.maxScrollPercent,0);
+const scroll=browser('/');scroll.root.scrollTop=100;scroll.listeners.scroll();scroll.advance(1000);scroll.flushTimers();
+assert.equal(scroll.requests.at(-1).payload.maxScrollPercent,50);
+scroll.root.scrollTop=200;scroll.listeners.scroll();scroll.root.scrollTop=0;scroll.listeners.scroll();scroll.advance(1000);scroll.flushTimers();
+assert.equal(scroll.requests.at(-1).payload.maxScrollPercent,100); // Fast down-and-back is captured before the next heartbeat.
+const elastic=browser('/');elastic.root.scrollTop=-20;elastic.listeners.scroll();elastic.advance(1000);elastic.flushTimers();assert.equal(elastic.requests.at(-1).payload.maxScrollPercent,0);
+elastic.root.scrollTop=198.5;elastic.listeners.scroll();elastic.advance(1000);elastic.flushTimers();assert.equal(elastic.requests.at(-1).payload.maxScrollPercent,100);
+const subsecond=browser('/');subsecond.advance(750);subsecond.document.visibilityState='hidden';subsecond.documentListeners.visibilitychange();
+assert.equal(subsecond.requests.at(-1).payload.visibleMs,750);subsecond.listeners.pagehide();const afterHide=subsecond.requests.length;
+subsecond.advance(120000);subsecond.document.visibilityState='visible';subsecond.documentListeners.visibilitychange();subsecond.advance(750);subsecond.listeners.interval();
+assert.equal(subsecond.requests.at(-1).payload.visibleMs,1500);assert.equal(subsecond.requests.length,afterHide+1);
+const restored=browser('/');const id=restored.requests[0].payload.pageViewId;restored.advance(5000);restored.listeners.pagehide();restored.advance(100000);restored.listeners.pageshow({persisted:true});
+assert.notEqual(restored.requests.at(-1).payload.pageViewId,id);assert.equal(restored.requests.at(-1).payload.visibleMs,0);
 assert.equal(browser('/',{storageBlocked:true}).requests.length,1);
 assert.equal(browser('/',{origin:'http://localhost:4173'}).requests.length,0);
-assert.equal(browser('/',{online:false}).requests.length,0);
-const idle=browser('/');for(let i=0;i<10;i++){idle.advance(15000);idle.listeners.interval();}
-assert.equal(idle.requests.filter(r=>r.payload.eventType==='engagement').reduce((n,r)=>n+r.payload.activeSeconds,0),60);
-console.log('PASS: collection, auth, field privacy, four pages, 90-day TTL, newest-first >500 paging, batched KV, timeout, idle/hidden/offline timing and blocked storage.');
+const offline=browser('/',{online:false});assert.equal(offline.requests.length,0);offline.advance(100000);offline.navigator.onLine=true;offline.listeners.online();assert.equal(offline.requests[0].payload.visibleMs,0);
+const failed=browser('/',{failNetwork:true});failed.advance(1000);await Promise.resolve();await Promise.resolve();assert.equal(failed.requests.length,1);
+console.log('PASS: auth/privacy, legacy compatibility, cumulative deduplication/loss/reordering, per-page visits, 5s reporting, quiet reading, delayed timers, monotonic clock, hidden/locked/offline time, subsecond precision, BFCache, mobile scrolling/overscroll and unavailable storage/network.');

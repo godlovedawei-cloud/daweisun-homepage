@@ -82,6 +82,15 @@ async function collect(request, env) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload) || !EVENTS.has(payload.eventType) || !pathOnly(payload.path)) {
     return respond({ error: 'Invalid event' }, 400);
   }
+  let metrics = {};
+  if (payload.metricsVersion !== undefined) {
+    if (payload.metricsVersion !== 2 || typeof payload.pageViewId !== 'string' || !/^[a-f0-9]{32}$/.test(payload.pageViewId) ||
+        ![payload.visibleMs, payload.activeMs].every(value => Number.isInteger(value) && value >= 0)) {
+      return respond({ error: 'Invalid cumulative metrics' }, 400);
+    }
+    const visibleMs = number(payload.visibleMs, 7 * 86400000);
+    metrics = { metricsVersion: 2, pageViewId: payload.pageViewId, visibleMs, activeMs: Math.min(number(payload.activeMs, 7 * 86400000), visibleMs) };
+  }
   const link = payload.eventType === 'link-click' ? linkFields(payload, env) : {};
   if (!link) return respond({ error: 'Invalid link' }, 400);
   const now = Date.now();
@@ -99,7 +108,7 @@ async function collect(request, env) {
     browserTimezone: clean(payload.timezone, 80), colorScheme: ['light', 'dark'].includes(payload.colorScheme) ? payload.colorScheme : '',
     userAgent, ...parseUserAgent(userAgent),
     activeSeconds: payload.eventType === 'engagement' ? number(payload.activeSeconds, 60) : 0,
-    maxScrollPercent: number(payload.maxScrollPercent, 100), ...link
+    maxScrollPercent: number(payload.maxScrollPercent, 100), ...link, ...metrics
   };
   // Fixed width reverse timestamp: lexical order is newest first without scanning history.
   const key = `visit:${String(9999999999999 - now).padStart(13, '0')}:${crypto.randomUUID()}`;
@@ -154,19 +163,47 @@ export function aggregateVisitors(rows) {
       v = { ip: row.ip, visitorId: row.visitorId || 'anonymous', visitCount: 0, firstSeen: row.timestamp, lastSeen: row.timestamp,
         country: row.country, region: row.region, city: row.city, timezone: row.timezone, asn: row.asn, asOrganization: row.asOrganization,
         deviceType: row.deviceType, browser: row.browser, os: row.os, browserTimezone: row.browserTimezone, colorScheme: row.colorScheme,
-        paths: new Set(), referrers: new Set(), linkClicks: {}, totalActiveSeconds: 0, maxScrollPercent: 0 };
+        paths: new Set(), referrers: new Set(), linkClicks: {}, totalActiveSeconds: 0, maxScrollPercent: 0,
+        legacyEventCount: 0, legacyActiveSeconds: 0, legacyDisplayDepthPercent: 0, visits: new Map() };
       grouped.set(key, v);
     }
-    if (row.eventType === 'pageview') v.visitCount++;
     if (row.timestamp < v.firstSeen) v.firstSeen = row.timestamp;
     if (row.timestamp > v.lastSeen) v.lastSeen = row.timestamp;
     if (row.path) v.paths.add(row.path);
     if (row.referrer) v.referrers.add(row.referrer);
     if (row.eventType === 'link-click' && row.linkType) v.linkClicks[row.linkType] = (v.linkClicks[row.linkType] || 0) + 1;
-    if (row.eventType === 'engagement') v.totalActiveSeconds += row.activeSeconds || 0;
-    v.maxScrollPercent = Math.max(v.maxScrollPercent, row.maxScrollPercent || 0);
+    if (row.metricsVersion === 2 && row.pageViewId) {
+      // One cumulative maximum per page load: duplicates, loss and out-of-order delivery cannot add time twice.
+      const visitKey = `${row.path}|${row.pageViewId}`;
+      let visit = v.visits.get(visitKey);
+      if (!visit) {
+        visit = { pageViewId: row.pageViewId, path: row.path, firstSeen: row.timestamp, lastSeen: row.timestamp,
+          visibleMs: 0, activeMs: 0, maxScrollPercent: 0 };
+        v.visits.set(visitKey, visit);
+      }
+      if (row.timestamp < visit.firstSeen) visit.firstSeen = row.timestamp;
+      if (row.timestamp > visit.lastSeen) visit.lastSeen = row.timestamp;
+      visit.visibleMs = Math.max(visit.visibleMs, row.visibleMs || 0);
+      visit.activeMs = Math.max(visit.activeMs, row.activeMs || 0);
+      visit.maxScrollPercent = Math.max(visit.maxScrollPercent, row.maxScrollPercent || 0);
+    } else {
+      v.legacyEventCount++;
+      if (row.eventType === 'pageview') v.visitCount++;
+      if (row.eventType === 'engagement') v.legacyActiveSeconds += row.activeSeconds || 0;
+      v.legacyDisplayDepthPercent = Math.max(v.legacyDisplayDepthPercent, row.maxScrollPercent || 0);
+    }
   }
-  return Array.from(grouped.values(), v => ({ ...v, paths: [...v.paths], referrers: [...v.referrers] })).sort((a, b) => b.lastSeen.localeCompare(a.lastSeen));
+  return Array.from(grouped.values(), v => {
+    const visits = [...v.visits.values()].sort((a, b) => b.lastSeen.localeCompare(a.lastSeen));
+    const visibleMs = visits.reduce((sum, visit) => sum + visit.visibleMs, 0);
+    const activeMs = visits.reduce((sum, visit) => sum + visit.activeMs, 0);
+    return { ...v, paths: [...v.paths], referrers: [...v.referrers], visits,
+      visitCount: v.visitCount + visits.length, totalVisibleSeconds: Math.floor(visibleMs / 1000),
+      totalActiveSeconds: Math.floor(activeMs / 1000) + v.legacyActiveSeconds,
+      totalMeasuredActiveSeconds: Math.floor(activeMs / 1000),
+      // Retained for older API consumers. The dashboard uses per-visit progress instead.
+      maxScrollPercent: Math.max(v.legacyDisplayDepthPercent, ...visits.map(visit => visit.maxScrollPercent)) };
+  }).sort((a, b) => b.lastSeen.localeCompare(a.lastSeen));
 }
 function parseUserAgent(ua) {
   return {
